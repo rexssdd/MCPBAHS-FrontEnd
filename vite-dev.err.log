@@ -1,0 +1,50 @@
+[2m11:33:07 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAnnouncements] fetchAll failed: Failed to fetch
+[2m11:33:07 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAnnouncements] fetchAll failed: Failed to fetch
+[2m11:33:42 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async getDailyBriefing (http://127.0.0.1:5174/src/services/teacher/dashboardService.js:102:19)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:33:42 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async getDailyBriefing (http://127.0.0.1:5174/src/services/teacher/dashboardService.js:102:19)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:33:44 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:33:44 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:33:45 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:33:45 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:32 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async getDailyBriefing (http://127.0.0.1:5174/src/services/teacher/dashboardService.js:102:19)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:32 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async getDailyBriefing (http://127.0.0.1:5174/src/services/teacher/dashboardService.js:102:19)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:34 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:34 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:35 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
+[2m11:40:35 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22m[useAsync] error: Error: Network error — check your connection.
+    at apiFetch (http://127.0.0.1:5174/src/Api/dashboardApi.js:15:9)
+    at async callDashboardAPIJson (http://127.0.0.1:5174/src/Api/dashboardApi.js:31:15)
+    at async http://127.0.0.1:5174/src/hooks/teacher/useDashboard.js:21:19
