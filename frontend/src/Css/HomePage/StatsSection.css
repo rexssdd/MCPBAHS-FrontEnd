@@ -1,0 +1,281 @@
+/* ============================================================
+   StatsSection.css
+   Aesthetic: Rich forest-green band with gold stat highlights,
+   glass-morphism cards, refined icon treatment, staggered reveal
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── Tokens ───────────────────────────────────────────────── */
+.stats-section {
+  --ss-bg:            #005510;
+  --ss-bg-deep:       #003d0b;
+  --ss-gold:          #FFF87F;
+  --ss-gold-dim:      rgba(255, 248, 127, 0.18);
+  --ss-gold-border:   rgba(255, 248, 127, 0.22);
+  --ss-gold-hover:    rgba(255, 248, 127, 0.12);
+  --ss-card-bg:       rgba(255, 255, 255, 0.06);
+  --ss-card-bg-hover: rgba(255, 255, 255, 0.11);
+  --ss-text-bright:   rgba(255, 255, 255, 0.92);
+  --ss-text-muted:    rgba(209, 250, 229, 0.75);
+
+  --ss-font-display: 'Playfair Display', Georgia, serif;
+  --ss-font-body:    'DM Sans', system-ui, sans-serif;
+
+  --ss-radius:      16px;
+  --ss-transition:  0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --ss-spring:      0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  position: relative;
+  background: linear-gradient(135deg, var(--ss-bg) 0%, var(--ss-bg-deep) 100%);
+  padding: 4.5rem 2rem;
+  overflow: hidden;
+}
+
+/* ── Background texture — subtle dot grid ─────────────────── */
+.stats-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,248,127,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* ── Ambient glow orbs ────────────────────────────────────── */
+.stats-section::after {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,248,127,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* ── Inner container ──────────────────────────────────────── */
+.stats-section__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ── Section header ───────────────────────────────────────── */
+.stats-section__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.stats-section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--ss-font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ss-gold);
+  margin-bottom: 0.65rem;
+  opacity: 0.85;
+}
+
+.stats-section__eyebrow-line {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: var(--ss-gold);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.stats-section__title {
+  font-family: var(--ss-font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stats-section__title em {
+  font-style: italic;
+  color: var(--ss-gold);
+}
+
+/* ── Stats grid ───────────────────────────────────────────── */
+.stats-section__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ── Stat card ────────────────────────────────────────────── */
+.stat-card {
+  position: relative;
+  background: var(--ss-card-bg);
+  border: 1px solid var(--ss-gold-border);
+  border-radius: var(--ss-radius);
+  padding: 1.6rem 1rem 1.4rem;
+  text-align: center;
+  cursor: default;
+
+  /* Scroll reveal — initial state */
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease,
+    background var(--ss-transition),
+    border-color var(--ss-transition),
+    box-shadow var(--ss-transition);
+}
+
+.stat-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glass inner highlight */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ss-radius);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.stat-card:hover {
+  background: var(--ss-card-bg-hover);
+  border-color: rgba(255, 248, 127, 0.45);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 248, 127, 0.12) inset;
+  transform: translateY(-5px) !important; /* override visible state */
+}
+
+/* ── Icon wrapper ─────────────────────────────────────────── */
+.stat-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--ss-gold-dim);
+  border: 1px solid var(--ss-gold-border);
+  margin: 0 auto 0.9rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background var(--ss-transition), transform var(--ss-spring);
+}
+
+.stat-card:hover .stat-card__icon {
+  background: rgba(255, 248, 127, 0.22);
+  transform: scale(1.1) rotate(-4deg);
+}
+
+/* ── Stat value ───────────────────────────────────────────── */
+.stat-card__value {
+  display: block;
+  font-family: var(--ss-font-display);
+  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  font-weight: 900;
+  color: var(--ss-gold);
+  line-height: 1.1;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+}
+
+/* ── Stat label ───────────────────────────────────────────── */
+.stat-card__label {
+  display: block;
+  font-family: var(--ss-font-body);
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--ss-text-muted);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+/* ── Divider between value and label ─────────────────────── */
+.stat-card__divider {
+  width: 20px;
+  height: 1.5px;
+  background: var(--ss-gold);
+  border-radius: 2px;
+  margin: 0.45rem auto;
+  opacity: 0.35;
+  transition: opacity var(--ss-transition), width var(--ss-transition);
+}
+
+.stat-card:hover .stat-card__divider {
+  opacity: 0.65;
+  width: 28px;
+}
+
+/* ── Bottom strip CTA ─────────────────────────────────────── */
+.stats-section__footer {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.stats-section__footer-text {
+  font-family: var(--ss-font-body);
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--ss-text-muted);
+  letter-spacing: 0.01em;
+}
+
+.stats-section__footer-text strong {
+  color: var(--ss-gold);
+  font-weight: 700;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .stats-section__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-section {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .stats-section__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem 0.75rem 1.1rem;
+  }
+
+  .stat-card__icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .stats-section__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+}

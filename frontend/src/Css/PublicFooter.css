@@ -1,0 +1,421 @@
+/* ============================================================
+   PublicFooter.css
+   Aesthetic: Deep forest editorial — near-black green base,
+   gold typographic accents, structured 4-column grid.
+   Full viewport width, self-contained tokens.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ── Design tokens ────────────────────────────────────────── */
+.pf-footer {
+  --pf-bg:          #040f06;
+  --pf-surface:     #081508;
+  --pf-surface-2:   #0d220f;
+
+  --pf-green-700:   #006312;
+  --pf-green-500:   #2e8b42;
+  --pf-green-300:   #7edd96;
+  --pf-green-100:   #c6eacc;
+
+  --pf-gold:        #d4a843;
+  --pf-gold-bright: #f0c55a;
+  --pf-gold-dim:    #8a6820;
+
+  --pf-border:      rgba(212, 168, 67, 0.12);
+  --pf-border-mid:  rgba(255, 255, 255, 0.06);
+
+  --pf-text-bright: #d0ead5;
+  --pf-text-mid:    #8aab90;
+  --pf-text-dim:    #4a6b50;
+  --pf-text-gold:   #d4a843;
+
+  --pf-font-display: 'Cormorant Garamond', Georgia, serif;
+  --pf-font-body:    'Outfit', system-ui, sans-serif;
+
+  --pf-radius-sm:   6px;
+  --pf-radius-md:   10px;
+  --pf-radius-full: 100px;
+
+  --pf-ease: 0.22s ease;
+}
+
+/* ── Footer shell — full viewport width ───────────────────── */
+.pf-footer {
+  width: 100%;
+  background-color: var(--pf-bg);
+  background-image:
+    radial-gradient(ellipse 70% 60% at 5%   0%,   rgba(0, 99, 18, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 45% at 95%  100%, rgba(212,168,67, 0.1)  0%, transparent 50%);
+  font-family: var(--pf-font-body);
+  color: var(--pf-text-bright);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle dot-grid texture overlay */
+.pf-footer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.028) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Top accent stripe ────────────────────────────────────── */
+.pf-footer__accent {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    transparent   0%,
+    var(--pf-green-700)  18%,
+    var(--pf-gold)       50%,
+    var(--pf-green-700)  82%,
+    transparent   100%
+  );
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Main content grid ────────────────────────────────────── */
+.pf-footer__main {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 4rem clamp(1.25rem, 5vw, 3.5rem) 3rem;
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 3rem;
+}
+
+/* ── Column heading ───────────────────────────────────────── */
+.pf-col-heading {
+  font-family: var(--pf-font-body);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pf-gold);
+  margin: 0 0 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.pf-col-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--pf-border);
+  border-radius: 1px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   BRANDING COLUMN
+════════════════════════════════════════════════════════════ */
+.pf-brand {}
+
+.pf-brand__logo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.pf-brand__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pf-gold) 0%, var(--pf-gold-dim) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 4px rgba(212, 168, 67, 0.14),
+    0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.pf-brand__name {
+  font-family: var(--pf-font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pf-gold);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.pf-brand__desc {
+  font-size: 0.83rem;
+  font-weight: 300;
+  color: var(--pf-text-mid);
+  line-height: 1.8;
+  margin: 0 0 1.15rem;
+  max-width: 340px;
+}
+
+.pf-brand__tagline {
+  display: inline-block;
+  font-family: var(--pf-font-display);
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--pf-text-mid);
+  border-left: 2px solid var(--pf-gold-dim);
+  padding-left: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* ════════════════════════════════════════════════════════════
+   QUICK LINKS
+════════════════════════════════════════════════════════════ */
+.pf-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.pf-nav-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  font-weight: 400;
+  color: var(--pf-text-bright);
+  text-decoration: none;
+  padding: 0.42rem 0.5rem;
+  border-radius: var(--pf-radius-sm);
+  opacity: 0.82;
+  transition:
+    color var(--pf-ease),
+    opacity var(--pf-ease),
+    background var(--pf-ease),
+    padding-left var(--pf-ease);
+}
+
+.pf-nav-list a::before {
+  content: '›';
+  font-size: 1.05rem;
+  color: var(--pf-text-dim);
+  line-height: 1;
+  transition: color var(--pf-ease), transform var(--pf-ease);
+  display: inline-block;
+}
+
+.pf-nav-list a:hover {
+  color: var(--pf-gold);
+  opacity: 1;
+  background: rgba(212, 168, 67, 0.06);
+  padding-left: 0.75rem;
+}
+
+.pf-nav-list a:hover::before {
+  color: var(--pf-gold);
+  transform: translateX(2px);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCHOOL INFO
+════════════════════════════════════════════════════════════ */
+.pf-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+}
+
+.pf-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pf-info-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pf-text-dim);
+}
+
+.pf-info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--pf-text-bright);
+  margin: 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SOCIAL / CONNECT
+════════════════════════════════════════════════════════════ */
+.pf-social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pf-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.86rem;
+  font-weight: 400;
+  color: var(--pf-text-bright);
+  text-decoration: none;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--pf-radius-md);
+  border: 1px solid transparent;
+  opacity: 0.82;
+  transition:
+    background var(--pf-ease),
+    border-color var(--pf-ease),
+    color var(--pf-ease),
+    opacity var(--pf-ease),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pf-social-link:hover {
+  background: rgba(212, 168, 67, 0.07);
+  border-color: rgba(212, 168, 67, 0.2);
+  color: var(--pf-gold);
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.pf-social-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pf-gold);
+  flex-shrink: 0;
+  transition:
+    background var(--pf-ease),
+    border-color var(--pf-ease);
+}
+
+.pf-social-link:hover .pf-social-icon {
+  background: rgba(212, 168, 67, 0.15);
+  border-color: rgba(212, 168, 67, 0.35);
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOTTOM BAR
+════════════════════════════════════════════════════════════ */
+.pf-footer__bottom {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 1.15rem clamp(1.25rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--pf-border-mid);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pf-copyright {
+  font-size: 0.73rem;
+  font-weight: 300;
+  color: var(--pf-text-dim);
+  letter-spacing: 0.01em;
+}
+
+.pf-legal-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.pf-legal-link {
+  font-size: 0.73rem;
+  font-weight: 400;
+  color: var(--pf-text-dim);
+  text-decoration: none;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--pf-radius-sm);
+  transition: color var(--pf-ease), background var(--pf-ease);
+}
+
+.pf-legal-link:hover {
+  color: var(--pf-gold);
+  background: rgba(212, 168, 67, 0.07);
+}
+
+.pf-legal-sep {
+  color: var(--pf-text-dim);
+  font-size: 0.65rem;
+  opacity: 0.35;
+  padding: 0 0.1rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+/* Large tablet: collapse to 2-col */
+@media (max-width: 1024px) {
+  .pf-footer__main {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.25rem;
+  }
+
+  .pf-brand {
+    grid-column: 1 / -1;
+    max-width: 480px;
+  }
+}
+
+/* Tablet: 1-col brand, 3-col details */
+@media (max-width: 768px) {
+  .pf-footer__main {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding-block: 3rem 2rem;
+  }
+
+  .pf-brand { grid-column: 1 / -1; }
+}
+
+/* Mobile: single column stack */
+@media (max-width: 520px) {
+  .pf-footer__main {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding-block: 2.5rem 1.5rem;
+  }
+
+  .pf-brand { max-width: 100%; }
+
+  .pf-footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-block: 1rem;
+  }
+
+  .pf-legal-links { flex-wrap: wrap; }
+}

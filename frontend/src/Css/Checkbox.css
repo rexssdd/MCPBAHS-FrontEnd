@@ -1,0 +1,58 @@
+/* src/Css/Checkbox.css */
+.cb-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.cb-label--disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Hide native input visually but keep it accessible */
+.cb-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cb-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--gray-300, #d1d5db);
+  border-radius: var(--radius-sm, 6px);
+  background: #fff;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.cb-input:checked + .cb-box,
+.cb-input[aria-checked="mixed"] + .cb-box {
+  background: var(--green-800, #003d0f);
+  border-color: var(--green-800, #003d0f);
+}
+
+.cb-input:focus-visible + .cb-box {
+  outline: 2px solid var(--green-800, #003d0f);
+  outline-offset: 2px;
+}
+
+.cb-dash {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.cb-text {
+  font-size: 13px;
+  color: var(--gray-700, #374151);
+}

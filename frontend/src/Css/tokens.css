@@ -1,0 +1,137 @@
+/* ═════════════════════════════════════════════════════════════
+   src/Css/tokens.css
+   Single source of truth for ALL design tokens.
+   Import ONCE in main.jsx — never repeat in component files.
+   ═════════════════════════════════════════════════════════════ */
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Brand greens (public site) ───────────────────────────── */
+  --green-900:  #0a2e0f;
+  --green-800:  #003d0f;
+  --green-700:  #006312;
+  --green-600:  #1a7a2a;
+  --green-400:  #4caf6a;
+  --green-200:  #bbf7d0;
+  --green-100:  #e8f5eb;
+  --green-50:   #f2faf3;
+
+  /* ── Brand greens (admin / dashboard) ────────────────────── */
+  --adm-green-900: #0f3d0f;
+  --adm-green-800: #1a5c1a;
+  --adm-green-700: #226622;
+
+  /* ── Gold / Yellow ────────────────────────────────────────── */
+  --gold:           #d4a843;
+  --gold-light:     #fef3d0;
+  --yellow-accent:  #FFF87F;
+  --yellow:         #f0b429;
+  --yellow-bg:      #fef9c3;
+
+  /* ── Semantic / Status ────────────────────────────────────── */
+  --red-50:   #fef2f2;
+  --red-100:  #fee2e2;
+  --red-600:  #dc2626;
+  --red-700:  #b91c1c;
+  --blue-50:  #eff6ff;
+  --blue-500: #3b82f6;
+
+  /* ── Neutrals (shared) ────────────────────────────────────── */
+  --white:      #ffffff;
+  --gray-50:    #f9fafb;
+  --gray-100:   #f3f4f6;
+  --gray-200:   #e5e7eb;
+  --gray-300:   #d1d5db;
+  --gray-400:   #9ca3af;
+  --gray-500:   #6b7280;
+  --gray-700:   #374151;
+  --gray-900:   #111827;
+
+  /* Public-site neutral aliases */
+  --neutral-900: #111612;
+  --neutral-700: #2d3530;
+  --neutral-500: #5c6460;
+  --neutral-300: #b8bfbb;
+  --neutral-100: #f4f6f4;
+  --neutral-50:  #fafbfa;
+
+  /* ── Layout ───────────────────────────────────────────────── */
+  --sb-width: 220px;
+
+  /* ── Radii ────────────────────────────────────────────────── */
+  --radius-sm:     6px;
+  --radius-md:     8px;    /* admin default */
+  --radius-md-pub: 12px;   /* public site default */
+  --radius-lg:     20px;
+  --radius-xl:     32px;
+
+  /* ── Shadows ──────────────────────────────────────────────── */
+  --shadow-sm: 0 2px 8px  rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg: 0 8px 28px rgba(0,0,0,.12);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,.20);
+
+  /* Green-tinted shadow aliases (public site) */
+  --shadow-green-sm: 0 2px 8px  rgba(10,46,15,0.08);
+  --shadow-green-md: 0 6px 24px rgba(10,46,15,0.12);
+  --shadow-green-lg: 0 16px 48px rgba(10,46,15,0.18);
+  --shadow-green-xl: 0 32px 80px rgba(10,46,15,0.22);
+
+  /* ── Typography ───────────────────────────────────────────── */
+  --font:         'Inter', system-ui, sans-serif;          /* admin */
+  --font-body:    'DM Sans', system-ui, sans-serif;        /* public */
+  --font-display: 'Playfair Display', Georgia, serif;      /* public headings */
+  --font-serif:   'DM Serif Display', Georgia, serif;      /* public accent */
+
+  /* ── Transitions ──────────────────────────────────────────── */
+  --transition:        0.15s ease;                               /* admin */
+  --transition-fast:   0.18s ease;                               /* public */
+  --transition-base:   0.3s cubic-bezier(0.4, 0, 0.2, 1);       /* public */
+  --transition-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); /* public */
+}
+
+/* ── Global resets ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html  { scroll-behavior: smooth; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+body  { background: var(--gray-100); color: var(--gray-900); line-height: 1.6; }
+img   { display: block; max-width: 100%; }
+a     { color: inherit; text-decoration: none; }
+button { font-family: var(--font); cursor: pointer; }
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--green-800);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Global keyframes ─────────────────────────────────────── */
+@keyframes slideUp  { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; }                               to { opacity:1; } }
+@keyframes scaleIn  { from { opacity:0; transform:scale(0.92); }        to { opacity:1; transform:scale(1); } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(28px); }   to { opacity:1; transform:translateY(0); } }
+@keyframes pulse    { 0%,100% { box-shadow:0 0 0 0 rgba(0,99,18,0.4); } 50% { box-shadow:0 0 0 8px rgba(0,99,18,0); } }
+@keyframes spin     { to { transform:rotate(360deg); } }
+
+/* ── Scroll-offset for anchor links ──────────────────────── */
+[id] { scroll-margin-top: 88px; }
+/* ── Skip to content (accessibility) ─────────────────────── */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  padding: 8px 16px;
+  background: var(--green-800);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 9999;
+  transition: top 0.15s ease;
+  text-decoration: none;
+}
+.skip-to-content:focus {
+  top: 16px;
+}

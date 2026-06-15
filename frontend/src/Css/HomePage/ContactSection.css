@@ -1,0 +1,499 @@
+/* ============================================================
+   ContactSection.css
+   Aesthetic: Warm institutional — deep forest green foundation,
+   ivory paper tones, gold detail accents. Full-viewport-width
+   section with editorial split layout.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ── Design tokens ────────────────────────────────────────── */
+.ct-section {
+  --ct-green-900:  #071a0b;
+  --ct-green-800:  #0d2e13;
+  --ct-green-700:  #006312;
+  --ct-green-600:  #1a7a2a;
+  --ct-green-400:  #4caf6a;
+  --ct-green-100:  #d6eeda;
+  --ct-green-50:   #f0faf2;
+
+  --ct-gold:       #c8973a;
+  --ct-gold-light: #fdf3e0;
+  --ct-ivory:      #fdfaf5;
+  --ct-ivory-mid:  #f5f0e8;
+
+  --ct-text-dark:  #0d1f10;
+  --ct-text-mid:   #2e4535;
+  --ct-text-muted: #6b8872;
+  --ct-white:      #ffffff;
+
+  --ct-font-display: 'Cormorant Garamond', Georgia, serif;
+  --ct-font-body:    'Outfit', system-ui, sans-serif;
+
+  --ct-radius-sm:  8px;
+  --ct-radius-md:  14px;
+  --ct-radius-lg:  22px;
+  --ct-radius-xl:  32px;
+
+  --ct-shadow-sm:   0 2px 10px rgba(7,26,11,0.07);
+  --ct-shadow-md:   0 8px 28px rgba(7,26,11,0.11);
+  --ct-shadow-lg:   0 20px 56px rgba(7,26,11,0.14);
+  --ct-shadow-card: 0 2px 16px rgba(7,26,11,0.08), 0 1px 4px rgba(7,26,11,0.05);
+
+  --ct-ease:   0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --ct-spring: 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Section shell — full viewport width ──────────────────── */
+.ct-section {
+  width: 100%;
+  background-color: var(--ct-ivory);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 5%  0%,   rgba(0, 99, 18, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 95% 100%, rgba(200,151,58, 0.07) 0%, transparent 50%);
+  padding: 6.5rem 0 7.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative top rule */
+.ct-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ct-green-700) 20%,
+    var(--ct-gold)      50%,
+    var(--ct-green-700) 80%,
+    transparent 100%
+  );
+}
+
+/* Faint diagonal stripe texture */
+.ct-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 48px,
+    rgba(0, 99, 18, 0.018) 48px,
+    rgba(0, 99, 18, 0.018) 49px
+  );
+  pointer-events: none;
+}
+
+/* ── Inner wrapper ────────────────────────────────────────── */
+.ct-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+}
+
+/* ── Section header ───────────────────────────────────────── */
+.ct-header {
+  max-width: 560px;
+  margin-bottom: 3.5rem;
+}
+
+.ct-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--ct-font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ct-green-700);
+  margin-bottom: 0.85rem;
+}
+
+.ct-eyebrow__line {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--ct-green-700);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ct-title {
+  font-family: var(--ct-font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  color: var(--ct-text-dark);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.9rem;
+}
+
+.ct-title em {
+  font-style: italic;
+  color: var(--ct-green-700);
+}
+
+.ct-subtitle {
+  font-family: var(--ct-font-body);
+  font-size: 0.96rem;
+  font-weight: 300;
+  color: var(--ct-text-mid);
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* ── Two-column layout ────────────────────────────────────── */
+.ct-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ════════════════════════════════════════════════════════════
+   LEFT COLUMN — Contact info + map
+════════════════════════════════════════════════════════════ */
+.ct-info-col {}
+
+/* Info list */
+.ct-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ct-info-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.95rem 1.1rem;
+  border-radius: var(--ct-radius-md);
+  transition: background var(--ct-ease);
+}
+
+.ct-info-item:hover {
+  background: var(--ct-green-50);
+}
+
+.ct-info-item + .ct-info-item {
+  border-top: 1px solid rgba(0, 99, 18, 0.07);
+}
+
+.ct-info-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+  width: 36px;
+  height: 36px;
+  background: var(--ct-green-50);
+  border: 1px solid var(--ct-green-100);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: background var(--ct-ease), border-color var(--ct-ease);
+}
+
+.ct-info-item:hover .ct-info-icon {
+  background: var(--ct-green-100);
+  border-color: rgba(0, 99, 18, 0.2);
+}
+
+.ct-info-body {}
+
+.ct-info-label {
+  display: block;
+  font-family: var(--ct-font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ct-green-700);
+  margin-bottom: 0.22rem;
+}
+
+.ct-info-value {
+  font-family: var(--ct-font-body);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ct-text-mid);
+  line-height: 1.5;
+}
+
+/* Map embed placeholder */
+.ct-map {
+  width: 100%;
+  height: 200px;
+  background: var(--ct-green-50);
+  border: 1px solid var(--ct-green-100);
+  border-radius: var(--ct-radius-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: var(--ct-green-700);
+  font-family: var(--ct-font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  position: relative;
+}
+
+/* When you have a real iframe, it fills this box */
+.ct-map iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.ct-map__placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.7;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT COLUMN — Contact form
+════════════════════════════════════════════════════════════ */
+.ct-form-col {}
+
+/* Card wrapper */
+.ct-form-card {
+  background: var(--ct-white);
+  border-radius: var(--ct-radius-xl);
+  border: 1px solid rgba(0, 99, 18, 0.1);
+  box-shadow: var(--ct-shadow-card);
+  padding: 2.25rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ct-form-title {
+  font-family: var(--ct-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ct-text-dark);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Form rows */
+.ct-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ct-form-label {
+  font-family: var(--ct-font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ct-text-mid);
+  letter-spacing: 0.02em;
+}
+
+.ct-form-input,
+.ct-form-textarea {
+  width: 100%;
+  font-family: var(--ct-font-body);
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--ct-text-dark);
+  background: var(--ct-ivory-mid);
+  border: 1.5px solid rgba(0, 99, 18, 0.12);
+  border-radius: var(--ct-radius-md);
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition:
+    border-color var(--ct-ease),
+    background var(--ct-ease),
+    box-shadow var(--ct-ease);
+  box-sizing: border-box;
+}
+
+.ct-form-input::placeholder,
+.ct-form-textarea::placeholder {
+  color: var(--ct-text-muted);
+  opacity: 0.7;
+}
+
+.ct-form-input:focus,
+.ct-form-textarea:focus {
+  border-color: var(--ct-green-700);
+  background: var(--ct-white);
+  box-shadow: 0 0 0 3px rgba(0, 99, 18, 0.08);
+}
+
+.ct-form-input--error {
+  border-color: #dc2626;
+  background: #fff8f8;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.ct-form-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.ct-form-textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+/* Submit button */
+.ct-form-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--ct-green-700);
+  color: var(--ct-white);
+  font-family: var(--ct-font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: var(--ct-radius-md);
+  padding: 0.85rem 1.75rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition:
+    background var(--ct-ease),
+    transform var(--ct-spring),
+    box-shadow var(--ct-ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.ct-form-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.ct-form-submit:hover {
+  background: var(--ct-green-800);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 99, 18, 0.35);
+}
+
+.ct-form-submit:active {
+  transform: translateY(0);
+}
+
+.ct-form-submit__arrow {
+  display: inline-block;
+  transition: transform var(--ct-ease);
+}
+
+.ct-form-submit:hover .ct-form-submit__arrow {
+  transform: translateX(4px);
+}
+
+/* ── Success state ────────────────────────────────────────── */
+.ct-success {
+  background: var(--ct-white);
+  border-radius: var(--ct-radius-xl);
+  border: 1px solid var(--ct-green-100);
+  box-shadow: var(--ct-shadow-card);
+  padding: 3.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: ct-scale-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ct-scale-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.ct-success__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ct-green-50);
+  border: 2px solid var(--ct-green-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.ct-success__title {
+  font-family: var(--ct-font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ct-green-700);
+  margin: 0 0 0.5rem;
+}
+
+.ct-success__body {
+  font-family: var(--ct-font-body);
+  font-size: 0.9rem;
+  color: var(--ct-text-muted);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 300px;
+}
+
+/* ── Section-fade animation ───────────────────────────────── */
+.ct-fade {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.ct-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+/* Tablet: single column */
+@media (max-width: 900px) {
+  .ct-section { padding: 5rem 0 6rem; }
+  .ct-grid     { grid-template-columns: 1fr; gap: 2rem; }
+  .ct-header   { margin-bottom: 2.5rem; }
+
+  .ct-map { height: 220px; }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .ct-section { padding: 3.5rem 0 4.5rem; }
+  .ct-header  { margin-bottom: 2rem; }
+  .ct-title   { font-size: clamp(1.7rem, 7vw, 2.2rem); }
+
+  .ct-form-card {
+    padding: 1.75rem 1.35rem 1.5rem;
+    border-radius: var(--ct-radius-lg);
+    gap: 1rem;
+  }
+
+  .ct-form-submit { width: 100%; justify-content: center; }
+
+  .ct-success { padding: 2.5rem 1.5rem; }
+}

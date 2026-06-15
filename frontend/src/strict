@@ -1,0 +1,144 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage"; 
+import G7Form from "./pages/enrollment/G7Form";
+import OldStudentForm from "./pages/enrollment/OldStudentForm";
+import Dashboard from "./pages/Admin/Dashboard";
+import FacultyAndStaff from "./pages/Admin/FacultyandStaff";
+import AdminReportsPage from "./pages/Admin/ReportsPage";  
+import AnnouncementsPage from "./pages/Principal/AnnouncementsPage"; 
+import NotificationsPage from "./pages/Principal/NotificationsPage"; 
+import ReportsPage from "./pages/Principal/ReportsPage"; 
+import EnrollmentPage from "./pages/Registrar/EnrollmentPage"; 
+
+import ProtectedRoute from "./Components/ProtectedRoute";
+import RoleProtectedRoute from "./Components/RoleProtectedRoute";
+
+// Example authentication and role state (replace with your auth logic)
+const isAuthenticated = true; 
+const currentUserRole = "admin"; // could be "admin", "principal", "registrar", "student"
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProfilePage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Enrollment */}
+        <Route 
+          path="/g7-form" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <G7Form />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/old-student-form" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <OldStudentForm />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Admin Routes */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['admin']}
+            >
+              <Dashboard />
+            </RoleProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/faculty-and-staff" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['admin']}
+            >
+              <FacultyAndStaff />
+            </RoleProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/reports" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['admin']}
+            >
+              <AdminReportsPage />
+            </RoleProtectedRoute>
+          } 
+        />
+
+        {/* Principal Routes */}
+        <Route 
+          path="/principal/announcements" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['principal']}
+            >
+              <AnnouncementsPage />
+            </RoleProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/principal/notifications" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['principal']}
+            >
+              <NotificationsPage />
+            </RoleProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/principal/reports" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['principal']}
+            >
+              <ReportsPage />
+            </RoleProtectedRoute>
+          } 
+        />
+
+        {/* Registrar Routes */}
+        <Route 
+          path="/Registrar/EnrollmentPage" 
+          element={
+            <RoleProtectedRoute 
+              userRole={currentUserRole} 
+              allowedRoles={['registrar']}
+            >
+              <EnrollmentPage />
+            </RoleProtectedRoute>
+          } 
+        />
+
+        {/* 404 */}
+        <Route path="*" element={<h1>404 Not Found</h1>} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

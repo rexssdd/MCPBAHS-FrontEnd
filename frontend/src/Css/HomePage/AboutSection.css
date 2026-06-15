@@ -1,0 +1,330 @@
+/* ============================================================
+   AboutSection.css
+   Aesthetic: Editorial organic — clean white canvas, forest-
+   green timeline spine, staggered milestone reveal, refined
+   typographic hierarchy
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Tokens ───────────────────────────────────────────────── */
+.about-section {
+  --about-green:        #006312;
+  --about-green-dark:   #004a0d;
+  --about-green-light:  #f0f7f1;
+  --about-green-faint:  #f7fcf7;
+  --about-gold:         #FFF87F;
+  --about-gold-border:  #e8d84a;
+
+  --about-text-heading: #0d2410;
+  --about-text-body:    #3d4f3e;
+  --about-text-muted:   #6b7e6c;
+  --about-text-year:    #006312;
+
+  --about-timeline-line:   #c8e6c9;
+  --about-timeline-dot-bg: #006312;
+  --about-timeline-dot-ring: #FFF87F;
+
+  --about-font-display: 'Playfair Display', Georgia, serif;
+  --about-font-body:    'DM Sans', system-ui, sans-serif;
+
+  --about-radius-sm:  6px;
+  --about-radius-md:  14px;
+  --about-radius-lg:  22px;
+
+  --about-transition: 0.3s ease;
+
+  background: #ffffff;
+  padding: 6rem 0 7rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Subtle background texture ────────────────────────────── */
+.about-section::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -180px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,99,18,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about-section::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,99,18,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Container ────────────────────────────────────────────── */
+.about-container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Section header ───────────────────────────────────────── */
+.about-header {
+  margin-bottom: 3.5rem;
+}
+
+.about-header__tag-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.about-header__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--about-font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--about-green);
+  padding: 0.32rem 0.85rem;
+  border-radius: var(--about-radius-sm);
+  background: var(--about-green-light);
+  border: 1px solid rgba(0,99,18,0.15);
+}
+
+.about-header__tag-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--about-green);
+  flex-shrink: 0;
+}
+
+.about-header__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0,99,18,0.2), transparent);
+}
+
+.about-heading {
+  font-family: var(--about-font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  color: var(--about-text-heading);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.about-heading em {
+  font-style: italic;
+  color: var(--about-green);
+}
+
+.about-subheading {
+  font-family: var(--about-font-body);
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--about-text-muted);
+  line-height: 1.7;
+  max-width: 540px;
+}
+
+/* ── Timeline list ────────────────────────────────────────── */
+.about-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+/* ── Timeline item ────────────────────────────────────────── */
+.about-milestone {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0 1.25rem;
+  padding-bottom: 2.5rem;
+
+  /* Scroll animation — managed by JS adding .visible */
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.about-milestone.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.about-milestone:last-child {
+  padding-bottom: 0;
+}
+
+/* ── Timeline spine (dot + line column) ───────────────────── */
+.about-milestone__spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* The dot */
+.about-milestone__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--about-timeline-dot-bg);
+  border: 3px solid var(--about-timeline-dot-ring);
+  outline: 2px solid var(--about-green);
+  outline-offset: 1px;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  transition: transform var(--about-transition), box-shadow var(--about-transition);
+  position: relative;
+  z-index: 1;
+}
+
+.about-milestone:hover .about-milestone__dot {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 5px rgba(0,99,18,0.1);
+}
+
+/* The connecting line */
+.about-milestone__line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(
+    to bottom,
+    var(--about-timeline-line) 0%,
+    rgba(200, 230, 201, 0.3) 100%
+  );
+  margin-top: 6px;
+  border-radius: 2px;
+}
+
+/* ── Milestone content ────────────────────────────────────── */
+.about-milestone__content {
+  padding-bottom: 0.5rem;
+}
+
+/* Year / era label */
+.about-milestone__year {
+  font-family: var(--about-font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--about-text-year);
+  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.about-milestone__year-badge {
+  display: inline-block;
+  background: var(--about-green-light);
+  border: 1px solid rgba(0,99,18,0.14);
+  color: var(--about-green);
+  font-family: var(--about-font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--about-radius-sm);
+  transition: background var(--about-transition), border-color var(--about-transition);
+}
+
+.about-milestone:hover .about-milestone__year-badge {
+  background: rgba(0,99,18,0.1);
+  border-color: rgba(0,99,18,0.25);
+}
+
+/* Body text */
+.about-milestone__body {
+  font-family: var(--about-font-body);
+  font-size: 0.91rem;
+  font-weight: 400;
+  color: var(--about-text-body);
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ── Card variant — hover lift on the content area ───────── */
+.about-milestone__card {
+  background: transparent;
+  border-radius: var(--about-radius-md);
+  padding: 1rem 1.1rem;
+  border: 1px solid transparent;
+  transition:
+    background var(--about-transition),
+    border-color var(--about-transition),
+    transform var(--about-transition),
+    box-shadow var(--about-transition);
+  margin-left: -1.1rem;
+}
+
+.about-milestone:hover .about-milestone__card {
+  background: var(--about-green-faint);
+  border-color: rgba(0,99,18,0.1);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,99,18,0.06);
+}
+
+/* ── Scroll-fade animation (shared with page) ─────────────── */
+.about-section-fade {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.about-section-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .about-section {
+    padding: 4rem 0 5rem;
+  }
+
+  .about-container {
+    padding: 0 1.25rem;
+  }
+
+  .about-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .about-milestone {
+    grid-template-columns: 32px 1fr;
+    gap: 0 0.9rem;
+    padding-bottom: 2rem;
+  }
+
+  .about-milestone__card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .about-milestone__body {
+    font-size: 0.87rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .about-milestone {
+    grid-template-columns: 28px 1fr;
+    gap: 0 0.75rem;
+  }
+}

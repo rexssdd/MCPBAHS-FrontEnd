@@ -1,0 +1,459 @@
+/* ============================================================
+   FacultySection.css
+   Aesthetic: Refined editorial — deep forest green, warm ivory,
+   gold accents. Full-viewport-width section.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ── Design tokens ────────────────────────────────────────── */
+.fac-section {
+  --fac-green-900:  #071a0b;
+  --fac-green-700:  #006312;
+  --fac-green-600:  #1a7a2a;
+  --fac-green-100:  #e4f2e7;
+  --fac-green-50:   #f4faf5;
+
+  --fac-gold:       #c8973a;
+  --fac-ivory:      #fdfaf5;
+  --fac-ivory-dark: #ede9de;
+
+  --fac-text-dark:  #0d1f10;
+  --fac-text-mid:   #3a5040;
+  --fac-text-muted: #7a9180;
+  --fac-white:      #ffffff;
+
+  --fac-font-display: 'Cormorant Garamond', Georgia, serif;
+  --fac-font-body:    'Outfit', system-ui, sans-serif;
+
+  --fac-radius-sm:  8px;
+  --fac-radius-md:  16px;
+  --fac-radius-lg:  24px;
+
+  --fac-shadow-card:  0 2px 14px rgba(7,26,11,0.08), 0 1px 3px rgba(7,26,11,0.05);
+  --fac-shadow-hover: 0 20px 52px rgba(7,26,11,0.15), 0 6px 18px rgba(7,26,11,0.09);
+
+  --fac-ease:    0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --fac-spring:  0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Section shell — full viewport width ──────────────────── */
+.fac-section {
+  width: 100%;
+  background-color: var(--fac-ivory);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 8%  100%, rgba(0, 99, 18, 0.07)  0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 92% 0%,   rgba(200,151, 58, 0.08) 0%, transparent 55%);
+  padding: 6.5rem 0 7.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative top rule */
+.fac-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--fac-green-700) 20%,
+    var(--fac-gold)      50%,
+    var(--fac-green-700) 80%,
+    transparent 100%
+  );
+}
+
+/* ── Inner wrapper ────────────────────────────────────────── */
+.fac-inner {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+}
+
+/* ── Section header ───────────────────────────────────────── */
+.fac-header {
+  max-width: 620px;
+  margin-bottom: 3.5rem;
+}
+
+.fac-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--fac-font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fac-green-700);
+  margin-bottom: 0.85rem;
+}
+
+.fac-eyebrow__line {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--fac-green-700);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.fac-title {
+  font-family: var(--fac-font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  color: var(--fac-text-dark);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.9rem;
+}
+
+.fac-title em {
+  font-style: italic;
+  color: var(--fac-green-700);
+}
+
+.fac-subtitle {
+  font-family: var(--fac-font-body);
+  font-size: 0.96rem;
+  font-weight: 300;
+  color: var(--fac-text-mid);
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* API warning notice */
+.fac-api-notice {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--fac-font-body);
+  font-size: 0.78rem;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: var(--fac-radius-sm);
+  padding: 0.4rem 0.9rem;
+}
+
+/* ── Faculty grid ─────────────────────────────────────────── */
+.fac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* ── Faculty card ─────────────────────────────────────────── */
+.fac-card {
+  position: relative;
+  background: var(--fac-white);
+  border-radius: var(--fac-radius-lg);
+  padding: 2.25rem 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(0, 99, 18, 0.09);
+  box-shadow: var(--fac-shadow-card);
+  overflow: hidden;
+  cursor: default;
+  transition:
+    transform var(--fac-spring),
+    box-shadow var(--fac-ease),
+    border-color var(--fac-ease);
+}
+
+/* Green accent bar — slides in from bottom on hover */
+.fac-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: var(--fac-radius-lg) 0 0 var(--fac-radius-lg);
+  background: linear-gradient(to bottom, var(--accent, #006312), color-mix(in srgb, var(--accent, #006312) 60%, #4caf6a));
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform var(--fac-spring);
+}
+
+/* Soft radial glow at top */
+.fac-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,99,18,0.06) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--fac-ease);
+  pointer-events: none;
+}
+
+.fac-card:hover {
+  transform: translateY(-10px) scale(1.015);
+  box-shadow: var(--fac-shadow-hover);
+  border-color: rgba(0, 99, 18, 0.18);
+}
+
+.fac-card:hover::before { transform: scaleY(1); }
+.fac-card:hover::after  { opacity: 1; }
+
+/* Card text body */
+.fac-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* ── Avatar wrapper ───────────────────────────────────────── */
+.fac-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin-bottom: 1.35rem;
+  flex-shrink: 0;
+  z-index: 1;
+  transition: transform var(--fac-spring);
+}
+
+.fac-card:hover .fac-avatar {
+  transform: scale(1.06);
+}
+
+/* Photo variant */
+.fac-avatar__photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border: 3px solid var(--fac-white);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+}
+
+/* Initials fallback variant */
+.fac-avatar__initials {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fac-font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--fac-white);
+  border: 3px solid var(--fac-white);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  letter-spacing: 0.03em;
+}
+
+/* Decorative ring around avatar */
+.fac-avatar__ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--accent, #006312);
+  opacity: 0.2;
+  transition: opacity var(--fac-ease), inset var(--fac-spring);
+  pointer-events: none;
+}
+
+.fac-card:hover .fac-avatar__ring {
+  opacity: 0.45;
+  inset: -7px;
+}
+
+/* ── Card text ────────────────────────────────────────────── */
+.fac-name {
+  font-family: var(--fac-font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--fac-text-dark);
+  margin: 0 0 0.32rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.fac-subject {
+  font-family: var(--fac-font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.6rem;
+  line-height: 1.4;
+}
+
+.fac-role {
+  display: inline-block;
+  font-family: var(--fac-font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fac-text-muted);
+  background: var(--fac-green-50);
+  border: 1px solid var(--fac-green-100);
+  border-radius: 100px;
+  padding: 0.22rem 0.85rem;
+  letter-spacing: 0.03em;
+  transition: background var(--fac-ease), border-color var(--fac-ease), color var(--fac-ease);
+}
+
+.fac-card:hover .fac-role {
+  background: var(--fac-green-100);
+  border-color: rgba(0, 99, 18, 0.22);
+  color: var(--fac-green-700);
+}
+
+/* ── Skeleton loading cards ───────────────────────────────── */
+.fac-skeleton {
+  background: var(--fac-white);
+  border-radius: var(--fac-radius-lg);
+  padding: 2.25rem 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(0, 99, 18, 0.06);
+  box-shadow: var(--fac-shadow-card);
+  gap: 0.75rem;
+}
+
+.fac-skeleton__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f8f4 50%, #e8ede9 75%);
+  background-size: 200% 100%;
+  animation: fac-shimmer 1.5s infinite;
+  margin-bottom: 0.6rem;
+}
+
+.fac-skeleton__line {
+  border-radius: 100px;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f8f4 50%, #e8ede9 75%);
+  background-size: 200% 100%;
+  animation: fac-shimmer 1.5s infinite;
+}
+
+.fac-skeleton__line--name { width: 70%; height: 14px; }
+.fac-skeleton__line--sub  { width: 55%; height: 11px; }
+.fac-skeleton__line--role { width: 40%; height: 10px; }
+
+@keyframes fac-shimmer {
+  0%   { background-position:  200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Section-fade animation ───────────────────────────────── */
+.fc-fade {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fc-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive breakpoints ───────────────────────────────── */
+
+/* Tablet: 2 columns */
+@media (max-width: 1024px) {
+  .fac-section   { padding: 5rem 0 6rem; }
+  .fac-grid      { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .fac-header    { margin-bottom: 2.75rem; }
+}
+
+/* Large mobile: 2 columns, compact */
+@media (max-width: 640px) {
+  .fac-section   { padding: 3.5rem 0 4.5rem; }
+  .fac-header    { margin-bottom: 2rem; }
+  .fac-title     { font-size: clamp(1.65rem, 6vw, 2.2rem); }
+  .fac-grid      { gap: 1rem; }
+
+  .fac-card,
+  .fac-skeleton  {
+    padding: 1.75rem 1.25rem 1.5rem;
+    border-radius: var(--fac-radius-md);
+  }
+
+  .fac-avatar,
+  .fac-skeleton__avatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  .fac-avatar__initials { font-size: 1.3rem; }
+  .fac-name             { font-size: 1rem; }
+}
+
+/* Small mobile: 1 column, horizontal card layout */
+@media (max-width: 420px) {
+  .fac-grid {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    margin-inline: auto;
+  }
+
+  .fac-card,
+  .fac-skeleton {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1.25rem 1.35rem;
+  }
+
+  .fac-avatar,
+  .fac-skeleton__avatar {
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .fac-card__body { align-items: flex-start; }
+
+  .fac-card::before {
+    border-radius: var(--fac-radius-md) 0 0 var(--fac-radius-md);
+    width: 4px;
+  }
+
+  .fac-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  /* Stack skeletons horizontally too */
+  .fac-skeleton {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .fac-skeleton__avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+  }
+
+  .fac-skeleton > div:not(.fac-skeleton__avatar) {
+    flex: 1;
+  }
+}
+
+/* ── Empty state (API returned []) ───────────────────────── */
+.fac-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-family: var(--fac-font-body);
+  font-size: 0.95rem;
+  color: var(--fac-text-muted);
+  padding: 3rem 1rem;
+}

@@ -1,0 +1,391 @@
+/* ============================================================
+   TVLSection.css
+   Imports shared tokens. No @import of Google Fonts here —
+   that lives exclusively in tokens.css.
+   ============================================================ */
+@import "./tokens.css";
+
+/* ── Section shell ────────────────────────────────────────── */
+.tvl-section {
+  width: 100%;
+  background: var(--green-50);
+  padding: 5.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Subtle background geometry ───────────────────────────── */
+.tvl-section::before {
+  content: '';
+  position: absolute;
+  top: -160px; right: -160px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,99,18,0.045) 0%, transparent 65%);
+  pointer-events: none;
+}
+.tvl-section::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; left: -100px;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,99,18,0.035) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* ── Inner container ──────────────────────────────────────── */
+.tvl-section__inner {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Section header ───────────────────────────────────────── */
+.tvl-section__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.tvl-section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-700);
+  margin-bottom: 0.65rem;
+}
+.tvl-section__eyebrow::before {
+  content: '';
+  display: block;
+  width: 22px; height: 2px;
+  background: var(--green-700);
+  border-radius: 2px;
+}
+
+.tvl-section__heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: var(--neutral-900);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.tvl-section__heading em {
+  font-style: italic;
+  color: var(--green-700);
+}
+
+.tvl-section__sub {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--neutral-500);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+/* ── Navigation controls ──────────────────────────────────── */
+.tvl-section__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.tvl-nav-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--green-700);
+  background: transparent;
+  color: var(--green-700);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base),
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+}
+.tvl-nav-btn:hover {
+  background: var(--green-700);
+  color: var(--yellow-accent);
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(0,99,18,0.3);
+}
+.tvl-nav-btn:active { transform: scale(0.96); }
+.tvl-nav-btn:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: 3px;
+}
+
+/* ── Carousel wrapper ─────────────────────────────────────── */
+.tvl-carousel { width: 100%; }
+
+/* ── Card grid ────────────────────────────────────────────── */
+.tvl-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+
+/* ── Card list item ───────────────────────────────────────── */
+.tvl-card-item { animation: tvl-slideUp 0.42s ease both; }
+.tvl-card-item:nth-child(1) { animation-delay: 0s; }
+.tvl-card-item:nth-child(2) { animation-delay: 0.07s; }
+.tvl-card-item:nth-child(3) { animation-delay: 0.14s; }
+
+@keyframes tvl-slideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TVL Card ─────────────────────────────────────────────── */
+.tvl-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(0,99,18,0.08);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+  outline: none;
+}
+.tvl-card:hover,
+.tvl-card:focus-visible {
+  transform: translateY(-10px) scale(1.015);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(0,99,18,0.22);
+}
+.tvl-card:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: 2px;
+}
+
+/* ── Card figure / image ──────────────────────────────────── */
+.tvl-card__figure {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  flex-shrink: 0;
+}
+.tvl-card__image {
+  width: 100%;
+  height: 185px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.tvl-card:hover .tvl-card__image { transform: scale(1.07); }
+
+.tvl-card__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.tvl-card__tag {
+  position: absolute;
+  top: 0.75rem; left: 0.75rem;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.7rem;
+  border-radius: 100px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.25);
+  line-height: 1;
+}
+
+/* ── Card body ────────────────────────────────────────────── */
+.tvl-card__body {
+  padding: 1.25rem 1.3rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.tvl-card__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neutral-900);
+  line-height: 1.3;
+  margin-bottom: 0.55rem;
+  letter-spacing: -0.01em;
+}
+.tvl-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--neutral-500);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tvl-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(0,99,18,0.08);
+  margin-top: auto;
+}
+.tvl-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--green-700);
+  transition: gap var(--transition-base), color var(--transition-base);
+}
+.tvl-card:hover .tvl-card__cta {
+  gap: 0.6rem;
+  color: var(--green-800);
+}
+.tvl-card__cta-arrow { transition: transform var(--transition-base); }
+.tvl-card:hover .tvl-card__cta-arrow { transform: translateX(3px); }
+
+.tvl-card__badge {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--green-700);
+  background: var(--green-100);
+  border: 1px solid rgba(0,99,18,0.15);
+  padding: 0.2rem 0.55rem;
+  border-radius: 100px;
+}
+
+/* ── Dots / pagination ────────────────────────────────────── */
+.tvl-section__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+.tvl-dot-btn {
+  height: 8px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: #c8e6c9;
+  transition: width 0.3s ease, background 0.3s ease, transform var(--transition-base);
+}
+.tvl-dot-btn--active {
+  background: var(--green-700);
+  width: 26px !important;
+}
+.tvl-dot-btn:not(.tvl-dot-btn--active) { width: 8px; }
+.tvl-dot-btn:hover:not(.tvl-dot-btn--active) {
+  background: var(--green-700);
+  opacity: 0.5;
+  transform: scale(1.2);
+}
+.tvl-dot-btn:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: 3px;
+}
+
+/* ── Scroll-fade ──────────────────────────────────────────── */
+.tvl-fade {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.tvl-fade.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .tvl-section__inner { padding: 0 2rem; }
+}
+@media (max-width: 900px) {
+  .tvl-section { padding: 4.5rem 0; }
+  .tvl-section__header { flex-direction: column; align-items: flex-start; gap: 1.25rem; margin-bottom: 2rem; }
+  .tvl-section__nav { align-self: flex-start; }
+  .tvl-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+}
+@media (max-width: 600px) {
+  .tvl-section { padding: 3.5rem 0; }
+  .tvl-section__inner { padding: 0 1.25rem; }
+  .tvl-cards-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .tvl-card__image { height: 200px; }
+  .tvl-section__heading { font-size: 1.5rem; }
+}
+@media (max-width: 400px) {
+  .tvl-section__inner { padding: 0 1rem; }
+  .tvl-nav-btn { width: 38px; height: 38px; }
+}
+
+/* ── Skeleton loading ── */
+.tvl-card--skeleton {
+  pointer-events: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+.tvl-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--tvl-skeleton-base, #e2e8f0) 25%,
+    var(--tvl-skeleton-shine, #f1f5f9) 50%,
+    var(--tvl-skeleton-base, #e2e8f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: tvl-shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+.tvl-skeleton--image  { width: 100%; height: 180px; border-radius: 0; flex-shrink: 0; }
+.tvl-skeleton--tag    { width: 110px; height: 20px; margin-bottom: 12px; border-radius: 999px; }
+.tvl-skeleton--title  { width: 80%;  height: 20px; margin-bottom: 10px; }
+.tvl-skeleton--line   { width: 100%; height: 13px; margin-bottom: 7px;  }
+.tvl-skeleton--short  { width: 60%; }
+
+@keyframes tvl-shimmer {
+  0%   { background-position:  200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Error banner ── */
+.tvl-section__error {
+  font-size: 0.8rem;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+}

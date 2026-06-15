@@ -1,0 +1,6 @@
+export const SUB_COLORS={"Science":{bg:"#fef2f2",bd:"#fca5a5",tx:"#991b1b"},"Mathematics":{bg:"#eff6ff",bd:"#93c5fd",tx:"#1e40af"},"English":{bg:"#f0fdf4",bd:"#86efac",tx:"#15803d"},"Filipino":{bg:"#fefce8",bd:"#fde047",tx:"#854d0e"},"MAPEH":{bg:"#fdf4ff",bd:"#e879f9",tx:"#7e22ce"},"TLE":{bg:"#fff7ed",bd:"#fb923c",tx:"#9a3412"},"Araling Panlipunan":{bg:"#f0f9ff",bd:"#67e8f9",tx:"#0e7490"},"ESP":{bg:"#f5f3ff",bd:"#a78bfa",tx:"#6d28d9"},"Computer Science":{bg:"#fef3c7",bd:"#fbbf24",tx:"#92400e"},"Values Education":{bg:"#fff1f2",bd:"#fda4af",tx:"#9f1239"}};
+export const getC=s=>SUB_COLORS[s]||{bg:"#f4f6f4",bd:"#9aaa9a",tx:"#374151"};
+export const DAYS=["Mon","Tue","Wed","Thu","Fri"];
+export const HOURS=[7,8,9,10,11,12,13,14,15,16,17];
+export const fmtH=h=>`${h>12?h-12:h===0?12:h}:00 ${h>=12?"pm":"am"}`;
+export const parseSlot=ts=>{try{const dm={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4};const[dPart,tPart]=ts.split(" at ");const[s,e]=tPart.split(" - ");const ph=t=>{const[hm,p]=t.trim().split(" ");let[h]=hm.split(":").map(Number);if(p==="pm"&&h!==12)h+=12;if(p==="am"&&h===12)h=0;return h;};const dp=dPart.split("-").map(d=>dm[d.trim()]).filter(d=>d!==undefined);const days=[];if(dp.length===2){for(let d=dp[0];d<=dp[1];d++)days.push(d);}else days.push(...dp);return{days,start:ph(s),end:ph(e)};}catch{return null;}};

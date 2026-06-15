@@ -1,0 +1,336 @@
+/* ==========================================================================
+   EnrollmentPage.css
+   Shared styles for the Enrollment page across all roles.
+   Role-specific overrides are applied via .role-{name} modifier on
+   the page root — no inline styles, no duplicated component files.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Page Root
+   -------------------------------------------------------------------------- */
+.enrollment-page {
+  /* Intentionally empty — inherits .page-layout from global styles */
+}
+
+/* --------------------------------------------------------------------------
+   Toolbar
+   -------------------------------------------------------------------------- */
+.enrollment-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(229,231,235,.7);
+}
+
+.enrollment-toolbar__spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.enrollment-toolbar .btn {
+  min-width: 125px;
+}
+
+.enrollment-toolbar .btn-outline {
+  color: var(--gray-700);
+}
+
+.enrollment-toolbar .btn-primary {
+  min-width: 150px;
+}
+
+/* --------------------------------------------------------------------------
+   Window-style table wrapper
+   -------------------------------------------------------------------------- */
+.enrollment-table-window {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  margin-bottom: 24px;
+}
+
+.window-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.window-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.window-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #d1d5db;
+}
+
+.window-dots span:first-child { background: #ef4444; }
+.window-dots span:nth-child(2) { background: #f59e0b; }
+.window-dots span:nth-child(3) { background: #22c55e; }
+
+.window-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #111827;
+}
+
+.window-subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* --------------------------------------------------------------------------
+   Action buttons and table row improvements
+   -------------------------------------------------------------------------- */
+.td-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+}
+
+.btn-danger {
+  min-width: auto;
+}
+
+.enrollment-page .badge-green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.enrollment-page .badge-yellow {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.enrollment-page .badge-red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.enrollment-page .badge-gray {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive adjustments
+   -------------------------------------------------------------------------- */
+.enrollment-table-window,
+.enrollment-toolbar {
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .enrollment-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .enrollment-toolbar__spacer {
+    display: none;
+  }
+
+  .bulk-actions,
+  .btn-add-enrollee,
+  .enrollment-toolbar > .btn,
+  .enrollment-toolbar .btn-outline {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .window-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px 14px;
+  }
+
+  .data-table th,
+  .data-table td {
+    white-space: normal;
+  }
+
+  .data-table {
+    min-width: 680px;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Role: Principal — read-focused overrides
+   Applied when the page root carries .role-principal
+   -------------------------------------------------------------------------- */
+
+/* Hide destructive / write actions entirely */
+.role-principal .bulk-actions,
+.role-principal .btn-add-enrollee,
+.role-principal .btn-archive-row,
+.role-principal .btn-edit-row {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Role: Registrar — data-entry role
+   ========================================================================== */
+.role-registrar .bulk-actions,
+.role-registrar .btn-archive-row {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Disabled button utility
+   Used when a button must stay in the DOM but be inert
+   (prefer display:none for write actions; use this for read-only contexts)
+   -------------------------------------------------------------------------- */
+.btn-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Enrollee Avatar
+   -------------------------------------------------------------------------- */
+.enrollee-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Enrollee View Header Card
+   -------------------------------------------------------------------------- */
+.enrollee-view-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.enrollee-view-header__meta {
+  /* text block sits between avatar and action button */
+}
+
+.enrollee-view-header__name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--green-800);
+  margin: 0 0 4px;
+}
+
+.enrollee-view-header__grade {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin: 0 0 2px;
+}
+
+.enrollee-view-header__city {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin: 0;
+}
+
+.enrollee-view-header__action {
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Enrollee Info Grid
+   Two-column grid that wraps cards neatly
+   -------------------------------------------------------------------------- */
+.enrollee-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Attachments Card
+   -------------------------------------------------------------------------- */
+.attachment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.attachment-row__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 2px;
+}
+
+.attachment-row__size {
+  font-size: 12px;
+  color: var(--green-800);
+  margin: 0;
+}
+
+.attachment-row__check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--green-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   Form Card Sections
+   -------------------------------------------------------------------------- */
+.form-section-label {
+  font-size: 13px;
+}
+
+/* Read-only field — used when principal has canEdit:false */
+.form-field-readonly {
+  background: var(--gray-50, #f9fafb);
+  cursor: default;
+  user-select: text;
+}
+
+/* --------------------------------------------------------------------------
+   Page Header
+   -------------------------------------------------------------------------- */
+.enrollment-page-header {
+  margin-bottom: 24px;
+}
