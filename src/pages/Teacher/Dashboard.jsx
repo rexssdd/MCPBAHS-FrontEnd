@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Sidebar from "../../Components/Sidebar";
-import { useDashboard } from "../../hooks/Teacher/useDashboard";
+import { useDashboard } from "../../hooks/teacher/useDashboard";
 import "../../Css/Teacher/Dashboard.css";
 import { TABS } from "./dashboard/teacherDashboardTokens.js";
 import {

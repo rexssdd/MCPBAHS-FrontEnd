@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { API_STATUS } from "../../../hooks/Teacher/useDashboard.js";
+import { API_STATUS } from "../../../hooks/teacher/useDashboard.js";
 
 /* ══════════════════════════════════════════════════════════
    SHARED UI PRIMITIVES
