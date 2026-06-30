@@ -193,7 +193,7 @@ export function PendingApplicationsCard({ data, loading, onProcess, onViewAll })
 }
 
 export function AppStatusCard({ data, stats, loading }) {
-  const { total = 378, approved = 210, pending = 128, incomplete = 40 } = data;
+  const { total = 378, approved = 210, pending = 128, incomplete = 40 } = data ?? {};
   const bars = [
     ["Approved", approved, "#1a5c1a"],
     ["Pending", pending, "#d97706"],
@@ -720,6 +720,7 @@ export function NotificationsCard({ data, loading }) {
 }
 
 export function DocumentStatsCard({ data, loading }) {
+  const safeData = data ?? { completionRate: 0, fullyComplete: 0, withMissing: 0, notSubmitted: 0 };
   return (
     <Card style={{ width: 260, flexShrink: 0 }} testId="doc-stats-card">
       <SectionTitle>Document Stats</SectionTitle>
@@ -729,15 +730,15 @@ export function DocumentStatsCard({ data, loading }) {
         <>
           <div style={{ textAlign: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 42, fontWeight: 800, color: "#1a5c1a", lineHeight: 1 }}>
-              {data.completionRate}%
+              {safeData.completionRate}%
             </div>
             <div style={{ fontSize: 12, color: "#6b7c6b" }}>Overall completion rate</div>
           </div>
           <Divider />
           {[
-            ["Fully Complete", data.fullyComplete, "#15803d"],
-            ["With Missing", data.withMissing, "#a16207"],
-            ["Not Submitted", data.notSubmitted, "#b91c1c"],
+            ["Fully Complete", safeData.fullyComplete, "#15803d"],
+            ["With Missing", safeData.withMissing, "#a16207"],
+            ["Not Submitted", safeData.notSubmitted, "#b91c1c"],
           ].map(([l, v, c]) => (
             <div
               key={l}
@@ -780,6 +781,7 @@ export function DocumentStatsCard({ data, loading }) {
 }
 
 export function EnrollmentBreakdownCard({ data, loading }) {
+  const safeData = data ?? { new: 0, returning: 0, transferees: 0, reEnrollees: 0 };
   return (
     <Card style={{ width: 280, flexShrink: 0 }} testId="enrollment-breakdown-card">
       <SectionTitle>Enrollment Type Breakdown</SectionTitle>
@@ -788,10 +790,10 @@ export function EnrollmentBreakdownCard({ data, loading }) {
       ) : (
         <>
           {[
-            ["New Enrollees", data.new, "#1a5c1a"],
-            ["Returning", data.returning, "#1d4ed8"],
-            ["Transferees", data.transferees, "#d97706"],
-            ["Re-enrollees", data.reEnrollees, "#7c3aed"],
+            ["New Enrollees", safeData.new, "#1a5c1a"],
+            ["Returning", safeData.returning, "#1d4ed8"],
+            ["Transferees", safeData.transferees, "#d97706"],
+            ["Re-enrollees", safeData.reEnrollees, "#7c3aed"],
           ].map(([l, v, c]) => (
             <div
               key={l}
