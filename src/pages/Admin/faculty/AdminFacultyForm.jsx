@@ -23,6 +23,7 @@ import {
   validateTextField,
 } from "../../../utils/inputValidation";
 import { PHILIPPINE_REGIONS, getCityOptions, getProvinceOptions } from "../../../utils/philippineLocations";
+import { uploadFacultyPhoto } from "../../../Api/facultyApi";
 
 const SEX_OPTIONS = [
   { label: "Male", value: "Male" },
@@ -244,6 +245,38 @@ export function FacultyForm({ initial, mode, onSave, onBackToList, onBackToView 
   const [saving, setSaving] = useState(false);
   const isMountedRef = useRef(true);
 
+  // ── Profile photo upload (edit mode only — needs an existing uuid) ──
+  const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl ?? initial?.photo_url ?? null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+
+  const handlePhotoSelect = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !initial?.uuid) return;
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Please select an image file.");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setPhotoError("Image must be 4MB or smaller.");
+      return;
+    }
+
+    setPhotoError("");
+    setPhotoUploading(true);
+    try {
+      const res = await uploadFacultyPhoto(initial.uuid, file);
+      const updated = res?.data ?? res;
+      setPhotoUrl(updated?.photoUrl ?? updated?.photo_url ?? URL.createObjectURL(file));
+    } catch (err) {
+      setPhotoError(err?.message || "Photo upload failed.");
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   useEffect(() => {
     if (initial) setForm(normalizeInitial(initial));
   }, [initial]);
@@ -305,6 +338,42 @@ export function FacultyForm({ initial, mode, onSave, onBackToList, onBackToView 
         <h2 className="form-section-title">
           {isEdit ? "Edit Faculty" : "Add Faculty"}
         </h2>
+
+        {/* ── Profile photo ── */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18 }}>
+          <div
+            style={{
+              width: 72, height: 72, borderRadius: "50%", overflow: "hidden",
+              background: "#e8ede9", display: "flex", alignItems: "center",
+              justifyContent: "center", flexShrink: 0, border: "1px solid #d6ded8",
+            }}
+          >
+            {photoUrl ? (
+              <img src={photoUrl} alt="Faculty profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: 12, color: "#7a8a7c" }}>No photo</span>
+            )}
+          </div>
+          <div>
+            <label className="btn btn-outline" style={{ cursor: isEdit ? "pointer" : "not-allowed", opacity: isEdit ? 1 : 0.5 }}>
+              {photoUploading ? "Uploading…" : "Upload Photo"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoSelect}
+                disabled={!isEdit || photoUploading}
+                style={{ display: "none" }}
+              />
+            </label>
+            <p style={{ fontSize: 12, color: "#7a8a7c", marginTop: 6 }}>
+              {isEdit
+                ? "Shown on the public homepage Faculty section. JPG/PNG, up to 4MB."
+                : "Save this faculty member first, then edit them to add a photo."}
+            </p>
+            {photoError && <p style={{ fontSize: 12, color: "#c0392b", marginTop: 4 }}>{photoError}</p>}
+          </div>
+        </div>
+
 
         {/* ── Personal ── */}
         <div className="form-grid-3">

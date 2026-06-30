@@ -100,11 +100,17 @@ export function archiveFaculty(id) {
 }
 
 /**
- * DELETE /faculty/:id
- * Hard-delete a faculty record.
+ * POST /faculty/:id/photo
+ * Upload (or replace) a faculty member's profile photo. The photo is then
+ * shown both in the admin Faculty and Staff list/view and on the public
+ * homepage Faculty section (via Personnel::photo_url).
  * @param {string} id
- * @returns {Promise<{ data: null, ok: boolean, ... }>}
+ * @param {File} file
+ * @returns {Promise<{ data: Faculty|null, ok: boolean, ... }>}
  */
-export function deleteFaculty(id) {
-  return apiClient.delete(`/faculty/${id}`);
+export async function uploadFacultyPhoto(id, file) {
+  const formData = new FormData();
+  formData.append("photo", file);
+  const result = await apiClient.post(`/faculty/${id}/photo`, formData);
+  return normaliseOne(result);
 }

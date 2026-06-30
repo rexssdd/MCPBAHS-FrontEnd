@@ -77,7 +77,7 @@ const DEFAULT_TVL_OFFERS = [
 
 // ── Normalize API item to internal shape ──────────────────
 // Adjust field names to match your actual API response.
-function mapApiOffer(item) {
+function mapApiOffer(item, index = 0) {
   return {
     id:          item.id,
     title:       item.title       ?? "Untitled Program",
@@ -88,7 +88,8 @@ function mapApiOffer(item) {
                    : item.competencies ?? item.skills ?? [],
     duration:    item.duration    ?? "2 Semesters",
     tesda:       item.tesda       ?? item.ncLevel ?? "NC II Eligible",
-    image:       item.image       ?? item.imageUrl ?? item.photo ?? "",
+    image:       item.image_url   ?? item.image ?? item.imageUrl ?? item.photo
+                   ?? DEFAULT_TVL_OFFERS[index % DEFAULT_TVL_OFFERS.length].image,
     accent:      item.accent      ?? item.color ?? "#1a4f7a",
   };
 }
@@ -161,7 +162,7 @@ export default function TVLSection() {
         if (cancelled) return;
 
         if (raw.length > 0) {
-          setOffers(raw.map(mapApiOffer));
+          setOffers(raw.map((item, idx) => mapApiOffer(item, idx)));
           setIndex(0); // reset carousel position on fresh data
         }
         // empty array → keep defaults

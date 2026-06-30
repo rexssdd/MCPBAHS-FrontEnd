@@ -26,6 +26,8 @@ import ProfilePage from "./pages/ProfilePage";
 /* ───────── ADMIN ───────── */
 import Dashboard from "./pages/Admin/Dashboard";
 import FacultyAndStaff from "./pages/Admin/FacultyandStaff";
+import AdminTvlOffersPage from "./pages/Admin/tvl/AdminTvlOffersPage";
+import AdminEventsPage from "./pages/Admin/AdminEventsPage";
 import Enrollmentlist from "./pages/Admin/Enrollment";
 import AdminReports from "./pages/Admin/Reports";
 import UserManagement from "./pages/Admin/UserManagement";
@@ -101,6 +103,8 @@ export default function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"        element={<DashboardErrorBoundary><Dashboard /></DashboardErrorBoundary>} />
           <Route path="faculty-and-staff" element={<FacultyErrorBoundary><FacultyAndStaff /></FacultyErrorBoundary>} />
+          <Route path="tvl-offers"        element={<DashboardErrorBoundary><AdminTvlOffersPage /></DashboardErrorBoundary>} />
+          <Route path="events"            element={<DashboardErrorBoundary><AdminEventsPage role="admin" /></DashboardErrorBoundary>} />
           <Route path="enrollmentlist"   element={<EnrollmentErrorBoundary><Enrollmentlist /></EnrollmentErrorBoundary>} />
           <Route path="reports"          element={<DashboardErrorBoundary><AdminReports /></DashboardErrorBoundary>} />
           <Route path="usermanagement"   element={<DashboardErrorBoundary><UserManagement /></DashboardErrorBoundary>} />
@@ -121,6 +125,7 @@ export default function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<DashboardErrorBoundary><PrincipalDashboard /></DashboardErrorBoundary>} />
           <Route path="announcements" element={<DashboardErrorBoundary><AnnouncementsPage /></DashboardErrorBoundary>} />
+          <Route path="events"        element={<DashboardErrorBoundary><AdminEventsPage role="principal" /></DashboardErrorBoundary>} />
           <Route path="notifications" element={<DashboardErrorBoundary><NotificationsPage /></DashboardErrorBoundary>} />
           <Route path="reports"       element={<DashboardErrorBoundary><ReportsPage /></DashboardErrorBoundary>} />
           <Route path="enrollmentlist" element={<EnrollmentErrorBoundary><PrincipalEnrollmentPage /></EnrollmentErrorBoundary>} />

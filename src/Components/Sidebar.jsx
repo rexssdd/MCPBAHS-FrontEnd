@@ -66,6 +66,22 @@ const Icons = {
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   ),
+  calendar: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <circle cx="8" cy="14" r="1" />
+      <circle cx="12" cy="14" r="1" />
+    </svg>
+  ),
+  tvl: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  ),
   enrollment: (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -137,6 +153,8 @@ export const NAV_CONFIGS = {
     main: [
       { label: "Dashboard",             path: "/admin/dashboard",         icon: Icons.dashboard   },
       { label: "Faculty and Staff",     path: "/admin/faculty-and-staff", icon: Icons.faculty     },
+      { label: "TVL Offers",            path: "/admin/tvl-offers",        icon: Icons.tvl         },
+      { label: "Events",                path: "/admin/events",            icon: Icons.calendar    },
       { label: "Enrollment",            path: "/admin/enrollmentlist",    icon: Icons.enrollment  },
       { label: "Scheduling & Section",  path: "/admin/scheduling",        icon: Icons.scheduling  },
       { label: "User Management",       path: "/admin/usermanagement",    icon: Icons.user        },
@@ -154,6 +172,7 @@ export const NAV_CONFIGS = {
       { label: "Dashboard",             path: "/principal/dashboard",      icon: Icons.dashboard      },
       { label: "Reports",               path: "/principal/reports",        icon: Icons.reports        },
       { label: "Announcements",         path: "/principal/announcements",  icon: Icons.announcements  },
+      { label: "Events",                path: "/principal/events",         icon: Icons.calendar       },
       { label: "Enrollment",            path: "/principal/enrollmentlist", icon: Icons.enrollment     },
     ],
     account: [
