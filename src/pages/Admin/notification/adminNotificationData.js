@@ -72,6 +72,28 @@ export const MOCK_NOTIFICATIONS = [
 
 export const GROUP_ORDER = ["Today", "Yesterday", "Earlier"];
 
+// ── Safe value coercion ────────────────────────────────────────────────────────
+// Some API fields (audience, section, gradeLevel, submittedBy, etc.) can come
+// back as objects like { uuid, name } instead of plain strings. Rendering an
+// object directly as a React child throws "Minified React error #31". This
+// helper unwraps the common shapes down to a displayable string so every
+// notification field is guaranteed to be primitive before it reaches JSX.
+export function toDisplayValue(value, fallback = "—") {
+  if (value === null || value === undefined || value === "") return fallback;
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (Array.isArray(value)) {
+    return value.length ? value.map(v => toDisplayValue(v, "")).filter(Boolean).join(", ") : fallback;
+  }
+  if (typeof value === "object") {
+    return (
+      value.name ?? value.title ?? value.label ?? value.fullName ?? value.full_name ??
+      value.section_name ?? value.sectionName ?? value.grade_level ?? value.gradeLevel ??
+      value.value ?? value.uuid ?? value.id ?? fallback
+    );
+  }
+  return String(value);
+}
+
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
 export function getGroupFromDate(dateStr) {
@@ -151,11 +173,13 @@ export function announcementToNotification(announcement) {
   const group     = getGroupFromDate(dateStr);
   const timeLabel = formatTime(dateStr);
 
-  const title    = announcement.title ?? announcement.message?.slice(0, 80) ?? "Announcement";
-  const message  = announcement.message ?? announcement.title ?? "No message";
-  const urgency  = announcement.urgency ?? "—";
-  const status   = announcement.status ?? "—";
-  const audience = announcement.target_audience ?? "All";
+  const title    = toDisplayValue(announcement.title ?? announcement.message?.slice(0, 80), "Announcement");
+  const message  = typeof announcement.message === "string"
+    ? announcement.message
+    : toDisplayValue(announcement.message ?? announcement.title, "No message");
+  const urgency  = toDisplayValue(announcement.urgency, "—");
+  const status   = toDisplayValue(announcement.status, "—");
+  const audience = toDisplayValue(announcement.target_audience, "All");
 
   return {
     id,
@@ -192,13 +216,14 @@ export function announcementsToNotifications(announcements) {
 export function reportToNotification(report) {
   if (!report || typeof report !== "object") return null;
 
-  const status = report.status ?? "";
+  const statusRaw = report.status ?? "";
+  const status    = toDisplayValue(statusRaw, "");
   if (!status || status === "Pending") return null; // skip unreviewed
 
   const isApproved = status === "Approved";
   const id         = report.uuid ?? report.id ?? `rpt-${Date.now()}-${Math.random()}`;
-  const fileName   = report.fileName ?? report.file_name ?? `SF${report.sfNumber ?? "?"}.pdf`;
-  const docId      = report.docId    ?? report.doc_id    ?? fileName;
+  const fileName   = toDisplayValue(report.fileName ?? report.file_name, `SF${toDisplayValue(report.sfNumber, "?")}.pdf`);
+  const docId      = toDisplayValue(report.docId ?? report.doc_id, fileName);
 
   // Use evaluatedOn / updated_at / dateSubmitted for grouping
   const dateStr    = report.evaluatedOn
@@ -213,7 +238,7 @@ export function reportToNotification(report) {
     ? `Report ${docId} has been approved by the principal`
     : `Report ${docId} has been disapproved by the principal`;
 
-  const comment = report.comment ?? report.remarks ?? report.comments ?? "No comments provided.";
+  const comment = toDisplayValue(report.comment ?? report.remarks ?? report.comments, "No comments provided.");
 
   return {
     id,
@@ -227,7 +252,7 @@ export function reportToNotification(report) {
       type:        "report",
       title:       isApproved ? "Report Approved" : "Report Disapproved",
       fileName,
-      submittedBy: report.submittedBy ?? report.submitted_by ?? "—",
+      submittedBy: toDisplayValue(report.submittedBy ?? report.submitted_by, "—"),
       submittedOn: (() => {
         const d = report.submittedOn ?? report.submitted_at ?? report.dateSubmitted;
         if (!d) return "—";
@@ -237,8 +262,8 @@ export function reportToNotification(report) {
       evaluatedOn: dateStr
         ? new Date(dateStr).toLocaleDateString()
         : "—",
-      gradeLevel:  report.gradeLevel  ?? report.grade_level  ?? "—",
-      section:     report.section     ?? "—",
+      gradeLevel:  toDisplayValue(report.gradeLevel ?? report.grade_level, "—"),
+      section:     toDisplayValue(report.section, "—"),
       status,
       comments:    comment,
     },

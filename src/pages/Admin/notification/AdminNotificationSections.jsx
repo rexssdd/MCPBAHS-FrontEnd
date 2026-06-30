@@ -19,6 +19,7 @@ import {
   RefreshIcon,
   XCircleIcon,
 } from "./AdminNotificationIcons.jsx";
+import { toDisplayValue } from "./adminNotificationData.js";
 
 // ── ErrorBanner ───────────────────────────────────────────────────────────────
 
@@ -151,7 +152,7 @@ export function DetailModal({ notif, onClose, onGoTo }) {
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", flexWrap: "wrap" }}>
                 <h2 id="detail-modal-title" className="notif-modal-title" style={{ margin: 0 }}>
-                  {d.title ?? (isReport ? "Report Evaluation" : "Announcement")}
+                  {toDisplayValue(d.title, isReport ? "Report Evaluation" : "Announcement")}
                 </h2>
                 <TypeTag type={notif.type} />
               </div>
@@ -180,7 +181,7 @@ export function DetailModal({ notif, onClose, onGoTo }) {
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="notif-field-label">{label}</p>
-                  <div className="notif-field-value">{value}</div>
+                  <div className="notif-field-value">{toDisplayValue(value)}</div>
                 </div>
               ))}
             </div>
@@ -193,14 +194,14 @@ export function DetailModal({ notif, onClose, onGoTo }) {
 
             <div style={{ marginBottom: "12px" }}>
               <p className="notif-field-label">Status</p>
-              <StatusChip status={d.status} />
+              <StatusChip status={toDisplayValue(d.status)} />
             </div>
 
             <div>
               <p className="notif-field-label">Comments / Remarks from Principal</p>
               <div className="notif-comments-value">
-                {d.comments && d.comments !== "No comments provided."
-                  ? d.comments
+                {d.comments && toDisplayValue(d.comments) !== "No comments provided."
+                  ? toDisplayValue(d.comments)
                   : <em style={{ color: "var(--notif-text-muted, #7a9280)" }}>No comments provided.</em>
                 }
               </div>
@@ -221,7 +222,7 @@ export function DetailModal({ notif, onClose, onGoTo }) {
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="notif-field-label">{label}</p>
-                  <div className="notif-field-value">{value}</div>
+                  <div className="notif-field-value">{toDisplayValue(value)}</div>
                 </div>
               ))}
             </div>
@@ -230,12 +231,12 @@ export function DetailModal({ notif, onClose, onGoTo }) {
 
             <p className="notif-modal-section-label" style={{ marginBottom: "10px" }}>Status</p>
             <div style={{ marginBottom: "12px" }}>
-              <StatusChip status={d.status ?? "Pending"} />
+              <StatusChip status={toDisplayValue(d.status, "Pending")} />
             </div>
 
             <div>
               <p className="notif-field-label">Message</p>
-              <div className="notif-comments-value">{d.comments ?? "—"}</div>
+              <div className="notif-comments-value">{toDisplayValue(d.comments)}</div>
             </div>
           </div>
         )}
