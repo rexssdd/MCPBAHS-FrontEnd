@@ -14,6 +14,7 @@
 
 import { useState } from "react";
 import { isPastDate, validateTextField } from "../../utils/inputValidation";
+import { toText } from "../../utils/safeRender.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -246,7 +247,7 @@ function PreviewModal({ form, mode, onConfirm, onCancel }) {
             </div>
             <div style={metaRowStyle}>
               <AudienceIcon />
-              <span>Target audience: <strong style={{ color: "#111827" }}>{form.target_audience}</strong></span>
+              <span>Target audience: <strong style={{ color: "#111827" }}>{toText(form.target_audience)}</strong></span>
             </div>
             <div style={metaRowStyle}>
               <CalendarIcon />
@@ -308,13 +309,13 @@ export default function AnnouncementForm({ initial, mode, onSave, onCancel, isSa
       // Identity / meta
       title:               initial.title               ?? base.title,
       message:             initial.message ?? initial.content ?? initial.text ?? base.message,
-      urgency:             (initial.urgency             ?? base.urgency).toLowerCase(),
+      urgency:             toText(initial.urgency ?? base.urgency, base.urgency).toLowerCase(),
       dissemination_modes: Array.isArray(initial.dissemination_modes)
                              ? initial.dissemination_modes
                              : Array.isArray(initial.channels)
                                ? initial.channels
                                : base.dissemination_modes,
-      target_audience:     (initial.target_audience ?? initial.targetAudience ?? initial.audience ?? base.target_audience).toLowerCase(),
+      target_audience:     toText(initial.target_audience ?? initial.targetAudience ?? initial.audience ?? base.target_audience, base.target_audience).toLowerCase(),
       publish_mode:        initial.publish_mode ?? base.publish_mode,
       status:              initial.status ?? undefined,
       date:                scheduledDate,

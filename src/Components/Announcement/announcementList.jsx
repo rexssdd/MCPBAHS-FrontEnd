@@ -16,6 +16,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { toText } from "../../utils/safeRender.js";
 
 // NEW-02 FIX: keys use lowercase to match AnnouncementUrgency enum values
 // ("high" | "normal" | "low") returned by the API via $this->urgency.
@@ -468,7 +469,7 @@ export default function AnnouncementList({
                       <div className="ann-meta">
                         <UrgencyPill urgency={ann.urgency} />
                         <span className="ann-meta-sep" />
-                        <span>{ann.target_audience}</span>
+                        <span>{toText(ann.target_audience)}</span>
                         <span className="ann-meta-sep" />
                         <span>{formatDate(ann.scheduled_at ?? ann.created_at)}</span>
                         {ann.status && (

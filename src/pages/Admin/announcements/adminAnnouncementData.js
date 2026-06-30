@@ -57,6 +57,18 @@ export const EMPTY_ANNOUNCEMENT_FORM = {
   attachments: [],
 };
 
+// Safely pull a display string out of a value that may be a plain string
+// OR a relation object the backend sometimes sends instead (e.g.
+// target_audience scoped to a specific section/grade comes back as
+// { uuid, name } rather than a plain enum string). Rendering that object
+// directly is what previously crashed the dashboard with React error #31.
+function readLabel(value, fallback) {
+  if (value === null || value === undefined || value === "") return fallback;
+  if (typeof value === "string") return value;
+  if (typeof value === "object") return value.name ?? value.label ?? fallback;
+  return fallback;
+}
+
 export function normalizeAnnouncement(raw) {
   // FIX FE-CNS-03: use raw.uuid (not raw.id) as the canonical identity field so
   // that update/delete calls build /announcements/:uuid instead of /announcements/undefined.
@@ -70,8 +82,10 @@ export function normalizeAnnouncement(raw) {
     title: raw.title ?? "Untitled",
     // Body: API sends "message"; legacy mocks used "content" / "body"
     content: raw.message ?? raw.content ?? raw.body ?? "",
-    // Audience: API sends "target_audience"
-    targetAudience: raw.target_audience ?? raw.targetAudience ?? raw.audience ?? "All Staff",
+    // Audience: API sends "target_audience" — may be a plain enum string
+    // ("all"/"teachers"/...) or a relation object ({ uuid, name }) when
+    // scoped to a specific section/grade. readLabel() handles both.
+    targetAudience: readLabel(raw.target_audience, null) ?? readLabel(raw.targetAudience, null) ?? readLabel(raw.audience, null) ?? "All Staff",
     // urgency (API) and priority (admin form) are the same concept.
     // PRIORITY_OPTIONS now matches the backend enum exactly (lowercase).
     priority: PRIORITY_OPTIONS.includes(raw.urgency)

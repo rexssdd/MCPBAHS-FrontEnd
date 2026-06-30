@@ -106,6 +106,39 @@ export function buildPayload(form) {
   return payload;
 }
 
+// Safely pull a display string out of a value that may be a plain string
+// OR a relation object the backend sometimes sends instead (e.g.
+// target_audience scoped to a specific section/grade comes back as
+// { uuid, name } rather than a plain enum string). Rendering that object
+// directly crashes React with "Objects are not valid as a React child"
+// (minified error #31).
+function readLabel(value, fallback) {
+  if (value === null || value === undefined || value === "") return fallback;
+  if (typeof value === "string") return value;
+  if (typeof value === "object") return value.name ?? value.label ?? fallback;
+  return fallback;
+}
+
+/**
+ * Normalizes a single raw announcement record so every field that gets
+ * rendered as plain text is guaranteed to be a string, even if the
+ * backend sends a relation object for fields like target_audience or
+ * the items inside dissemination_modes.
+ */
+function normalizeAnnouncementRecord(raw) {
+  if (!raw || typeof raw !== "object") return raw;
+  return {
+    ...raw,
+    title:           readLabel(raw.title, raw.title ?? ""),
+    target_audience: readLabel(raw.target_audience, raw.target_audience ?? "all"),
+    urgency:         readLabel(raw.urgency, raw.urgency ?? "normal"),
+    status:          readLabel(raw.status, raw.status ?? "Pending"),
+    dissemination_modes: Array.isArray(raw.dissemination_modes)
+      ? raw.dissemination_modes.map((m) => readLabel(m, m))
+      : raw.dissemination_modes,
+  };
+}
+
 // ── Internal helper ───────────────────────────────────────────────────────────
 
 /**
@@ -198,7 +231,7 @@ export async function fetchAnnouncements({ signal } = {}) {
     : Array.isArray(result.data)
       ? result.data
       : [];
-  return { ok: true, data: arr };
+  return { ok: true, data: arr.map(normalizeAnnouncementRecord) };
 }
 
 /**
@@ -206,7 +239,8 @@ export async function fetchAnnouncements({ signal } = {}) {
  * Returns { ok, data: Announcement } on success.
  */
 export async function createAnnouncement(form) {
-  return request("POST", "/announcements", buildPayload(form));
+  const result = await request("POST", "/announcements", buildPayload(form));
+  return result.ok ? { ...result, data: normalizeAnnouncementRecord(result.data) } : result;
 }
 
 /**
@@ -214,7 +248,8 @@ export async function createAnnouncement(form) {
  * Returns { ok, data: Announcement } on success.
  */
 export async function updateAnnouncement(id, form) {
-  return request("PUT", `/announcements/${id}`, buildPayload(form));
+  const result = await request("PUT", `/announcements/${id}`, buildPayload(form));
+  return result.ok ? { ...result, data: normalizeAnnouncementRecord(result.data) } : result;
 }
 
 /**

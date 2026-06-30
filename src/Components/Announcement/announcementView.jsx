@@ -6,6 +6,7 @@
  *   onBack() — navigate back to the list
  * ─────────────────────────────────────────────────────────────────────────────
  */
+import { toText } from "../../utils/safeRender.js";
 
 // NEW-02 FIX: lowercase keys match AnnouncementUrgency enum ("high"|"normal"|"low").
 // Title-case aliases kept for mock/legacy data compatibility.
@@ -117,7 +118,7 @@ export default function AnnouncementView({ ann }) {
           </div>
           <div style={metaRowStyle}>
             Target audience:{" "}
-            <span style={metaValueStyle}>{ann.target_audience ?? ann.audience}</span>
+            <span style={metaValueStyle}>{toText(ann.target_audience ?? ann.audience)}</span>
           </div>
           <div style={metaRowStyle}>
             Date to be disseminated:{" "}
