@@ -31,6 +31,7 @@ export async function logout(token) {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
       },
+      credentials: "include",
     });
   } catch {
     // Ignore network errors — the local session is cleared by the caller.

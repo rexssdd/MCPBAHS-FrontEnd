@@ -1,4 +1,5 @@
 /** Section cards and charts for the Principal dashboard. */
+import { toText } from "../../../utils/safeRender.js";
 import {
   STATUS_COLOR,
   SEVERITY_COLOR,
@@ -380,10 +381,10 @@ export const TeacherCard = ({ data, stats }) => (
       : data.map((t, i) => (
           <div key={i} className="list-row">
             <div>
-              <div className="list-row__name">{t.name}</div>
-              <div className="list-row__meta">{t.subject} · {t.load} sections</div>
+              <div className="list-row__name">{toText(t.name)}</div>
+              <div className="list-row__meta">{toText(t.subject)} · {toText(t.load, 0)} sections</div>
             </div>
-            <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{t.status}</span>
+            <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{toText(t.status)}</span>
           </div>
         ))
     }

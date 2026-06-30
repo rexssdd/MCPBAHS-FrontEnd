@@ -110,6 +110,38 @@ export const validateStrands = (data) => {
 };
 
 /**
+ * Validates teacher roster rows used by Teacher/RPMS cards.
+ * Guards against nested relation objects (e.g. { uuid, name }) ending
+ * up where a plain string is expected — this is what previously
+ * crashed the dashboard with React error #31.
+ */
+export const validateTeacherData = (data) => {
+  if (!isValidArray(data)) return false;
+
+  return data.every(
+    (t) =>
+      t &&
+      typeof t === "object" &&
+      typeof t.name === "string" &&
+      typeof t.subject === "string" &&
+      typeof t.status === "string"
+  );
+};
+
+/**
+ * Validates transferee summary counts.
+ */
+export const validateTransferees = (data) => {
+  return (
+    data &&
+    typeof data === "object" &&
+    isValidNumber(data.incoming) &&
+    isValidNumber(data.outgoing) &&
+    isValidNumber(data.returnees)
+  );
+};
+
+/**
  * Validates notifications
  */
 export const validateNotifications = (data) => {
@@ -159,6 +191,8 @@ export const validateDashboardData = (data, defaultData) => {
     strands: validateStrands,
     notifications: validateNotifications,
     calendarEvents: validateCalendarEvents,
+    teacherData: validateTeacherData,
+    transferees: validateTransferees,
   };
 
   Object.entries(validators).forEach(([key, validator]) => {

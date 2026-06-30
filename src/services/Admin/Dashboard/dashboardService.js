@@ -12,6 +12,71 @@
 
 import apiClient from "../apiClient";
 
+/* ─── Helpers: safely read a possibly-nested field ──────────── */
+/**
+ * Real backend records often nest a label under a relation object
+ * (e.g. department: { uuid, name }) instead of returning a plain
+ * string. This pulls a readable string out of either shape.
+ */
+function readLabel(value, fallback = "") {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "string") return value || fallback;
+  if (typeof value === "object") return value.name ?? value.label ?? fallback;
+  return fallback;
+}
+
+/**
+ * Normalises a raw teacher/faculty record (whatever shape the live
+ * /teachers endpoint returns — uuid, full_name or first/last name,
+ * department, position, employment_status, assigned subjects/sections
+ * as arrays of objects, etc.) into the flat shape the dashboard
+ * Teacher cards expect: { name, subject, load, status }.
+ *
+ * Falls back gracefully on every field so a single malformed record
+ * never crashes the dashboard (this is what previously caused
+ * "Minified React error #31" when a nested { uuid, name } object was
+ * rendered directly as a child).
+ */
+function normaliseTeacherRecord(t) {
+  if (!t || typeof t !== "object") return null;
+
+  const name =
+    readLabel(t.name) ||
+    t.full_name ||
+    [t.first_name, t.middle_name, t.last_name].filter(Boolean).join(" ") ||
+    "Unnamed";
+
+  const subject =
+    readLabel(t.subject) ||
+    readLabel(t.department) ||
+    readLabel(t.position) ||
+    (Array.isArray(t.subjects) ? t.subjects.map((s) => readLabel(s)).filter(Boolean).join(", ") : "") ||
+    "—";
+
+  const sectionList = Array.isArray(t.sections)
+    ? t.sections
+    : Array.isArray(t.assigned_sections)
+      ? t.assigned_sections
+      : null;
+  const load =
+    typeof t.load === "number"
+      ? t.load
+      : typeof t.section_count === "number"
+        ? t.section_count
+        : sectionList
+          ? sectionList.length
+          : 0;
+
+  const status = readLabel(t.status) || readLabel(t.employment_status) || "Active";
+
+  return { name, subject, load, status: /active/i.test(status) ? "Active" : status };
+}
+
+function normaliseTeacherRoster(list) {
+  if (!Array.isArray(list)) return list;
+  return list.map(normaliseTeacherRecord).filter(Boolean);
+}
+
 /* ─── Role-aware fetch helper ──────────────────────────────── */
 /**
  * GET a path with an optional role query param and abort signal.
@@ -92,7 +157,9 @@ export async function fetchDashboardByRole(role, defaults, signal) {
     fetchApplicationStatus(defaults.applicationStatus, apiRole, signal),
     fetchAttendanceData   (defaults.attendanceData,    apiRole, signal),
     fetchAtRiskStudents   (defaults.atRiskStudents,    apiRole, signal),
-    fetchTeacherData      (defaults.teacherData,       apiRole, signal),
+    fetchTeacherData      (defaults.teacherData,       apiRole, signal).then((r) =>
+      r.fromApi ? { ...r, data: normaliseTeacherRoster(r.data) } : r
+    ),
     fetchFeeData          (defaults.feeData,           apiRole, signal),
     fetchCalendarEvents   (defaults.calendarEvents,    apiRole, signal),
     fetchNotifications    (defaults.notifications,     apiRole, signal),

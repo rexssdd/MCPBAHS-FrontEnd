@@ -11,6 +11,7 @@ import {
   Skel,
   StatCard,
 } from "./TeacherDashboardPrimitives.jsx";
+import { toText } from "../../../utils/safeRender.js";
 
 /* ══════════════════════════════════════════════════════════
    ATTENDANCE CARD
@@ -48,14 +49,14 @@ export const AttendanceCard = ({ data, onViewAll, loading }) => {
                     borderBottom:i<5?"1px solid #f4f6f4":"none" }}>
                     <div style={{ width:30, height:30, borderRadius:"50%", background:"#f0fdf4", border:"1.5px solid #bbf7d0",
                       display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:10, fontWeight:800, color:"#1a5c1a" }}>
-                      {s.name.split(",")[0][0]}
+                      {toText(s.name).charAt(0)}
                     </div>
                     <div style={{ flex:1 }}>
-                      <div style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{s.name}</div>
+                      <div style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{toText(s.name)}</div>
                       <div style={{ fontSize:10, color:"#9aaa9a" }}>{s.id}</div>
                     </div>
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:2, flexShrink:0 }}>
-                      <span className="badge" style={{ color:ac.color, background:ac.bg, border:`1px solid ${ac.border}` }}>{s.status}</span>
+                      <span className="badge" style={{ color:ac.color, background:ac.bg, border:`1px solid ${ac.border}` }}>{toText(s.status)}</span>
                       <span style={{ fontSize:10, color:"#9aaa9a" }}>{s.time}</span>
                     </div>
                   </div>
@@ -112,7 +113,7 @@ export const GradeBookCard = ({ data, onViewAll, loading }) => {
                     borderBottom:i<5?"1px solid #f4f6f4":"none" }}>
                     <div style={{ flex:1 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                        <span style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{s.name}</span>
+                        <span style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{toText(s.name)}</span>
                         <span style={{ fontSize:13, fontWeight:800, color:s.avg<75?"#b91c1c":s.avg>=90?"#15803d":"#111f11" }}>
                           {s.avg.toFixed(1)}
                         </span>
@@ -144,7 +145,7 @@ export const LowPerformersCard = ({ data, onViewAll, loading }) => (
           {data.map((s,i) => (
             <div key={i} style={{ padding:"12px 14px", background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:12 }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontWeight:700, fontSize:12.5, color:"#111f11" }}>{s.name}</span>
+                <span style={{ fontWeight:700, fontSize:12.5, color:"#111f11" }}>{toText(s.name)}</span>
                 <span style={{ fontWeight:800, fontSize:16, color:s.avg<60?"#b91c1c":"#a16207" }}>{s.avg.toFixed(1)}</span>
               </div>
               <div style={{ fontSize:10, color:"#9aaa9a", marginBottom:5 }}>{s.absences} absences · Grade {s.grade}</div>
@@ -226,7 +227,7 @@ export const ScheduleCard = ({ data, loading }) => (
                 {!isBreak
                   ? <>
                       <div style={{ flex:1 }}>
-                        <div style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{p.subject}</div>
+                        <div style={{ fontSize:12.5, fontWeight:700, color:"#111f11" }}>{toText(p.subject)}</div>
                         <div style={{ fontSize:10, color:"#9aaa9a" }}>{p.section} · {p.room}</div>
                       </div>
                       <span style={{ fontSize:10, fontWeight:700, color:"#1a5c1a", background:"#f0fdf4",
@@ -296,11 +297,11 @@ export const RecentActivityCard = ({ data, loading }) => {
                   borderBottom:i<data.length-1?"1px solid #f4f6f4":"none" }}>
                   <div style={{ width:30, height:30, borderRadius:"50%", background:"#f0fdf4", border:"1.5px solid #bbf7d0",
                     display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:10, fontWeight:800, color:"#1a5c1a" }}>
-                    {r.name.split(",")[0][0]}
+                    {toText(r.name).charAt(0)}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:12, fontWeight:700, color:"#111f11", whiteSpace:"nowrap",
-                      overflow:"hidden", textOverflow:"ellipsis" }}>{r.name}</div>
+                      overflow:"hidden", textOverflow:"ellipsis" }}>{toText(r.name)}</div>
                     <div style={{ fontSize:10, color:"#9aaa9a" }}>{r.detail} · {r.time}</div>
                   </div>
                   <span className="badge" style={{ color:ac.color, background:ac.bg }}>{r.action}</span>
@@ -334,8 +335,8 @@ export const CalendarCard = ({ data, loading }) => (
                   <div style={{ fontSize:17, fontWeight:800, color:"#111f11", lineHeight:1 }}>{day}</div>
                 </div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:12.5, color:"#1a3a1a", fontWeight:500, lineHeight:1.3 }}>{ev.label}</div>
-                  <div style={{ fontSize:10, color, fontWeight:700, marginTop:2, textTransform:"uppercase" }}>{ev.type}</div>
+                  <div style={{ fontSize:12.5, color:"#1a3a1a", fontWeight:500, lineHeight:1.3 }}>{toText(ev.label)}</div>
+                  <div style={{ fontSize:10, color, fontWeight:700, marginTop:2, textTransform:"uppercase" }}>{toText(ev.type)}</div>
                 </div>
               </div>
             );
@@ -363,7 +364,7 @@ export const NotificationsCard = ({ data, loading }) => (
                   {nc.icon}
                 </span>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:12, color:"#1a3a1a", lineHeight:1.4 }}>{n.msg}</div>
+                  <div style={{ fontSize:12, color:"#1a3a1a", lineHeight:1.4 }}>{toText(n.msg)}</div>
                   <div style={{ fontSize:10, color:"#9aaa9a", marginTop:2 }}>{n.time}</div>
                 </div>
               </div>

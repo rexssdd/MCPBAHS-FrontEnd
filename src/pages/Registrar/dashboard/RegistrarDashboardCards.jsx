@@ -1,4 +1,5 @@
 import { Card, SectionTitle, Divider, Skel } from "./RegistrarDashboardPrimitives.jsx";
+import { toText } from "../../../utils/safeRender.js";
 import {
   statusColor,
   getStatus,
@@ -127,7 +128,7 @@ export function PendingApplicationsCard({ data, loading, onProcess, onViewAll })
                 >
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "#111f11" }}>{app.name}</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "#111f11" }}>{toText(app.name)}</span>
                       {app.priority === "high" && (
                         <span className="badge" style={{ color: pc.color, background: pc.bg, fontSize: 9 }}>
                           URGENT
@@ -139,7 +140,7 @@ export function PendingApplicationsCard({ data, loading, onProcess, onViewAll })
                       <span style={{ fontSize: 10, color: "#9aaa9a" }}>·</span>
                       <span style={{ fontSize: 11, color: "#4a5e4a" }}>Grade {app.grade}</span>
                       <span style={{ fontSize: 10, color: "#9aaa9a" }}>·</span>
-                      <span style={{ fontSize: 11, color: "#4a5e4a" }}>{app.type}</span>
+                      <span style={{ fontSize: 11, color: "#4a5e4a" }}>{toText(app.type)}</span>
                     </div>
                   </div>
                   <div
@@ -307,11 +308,11 @@ export function MissingDocsCard({ data, loading, onSendReminders }) {
                   color: "#1a5c1a",
                 }}
               >
-                {s.name.split(",")[0][0]}
+                {toText(s.name).charAt(0)}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111f11", marginBottom: 3 }}>
-                  {s.name}
+                  {toText(s.name)}
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                   {s.missing.map((doc) => (
@@ -431,7 +432,7 @@ export function RecentlyProcessedCard({ data, loading }) {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {r.name}
+                    {toText(r.name)}
                   </div>
                   <div style={{ fontSize: 10, color: "#9aaa9a" }}>
                     G{r.grade} · {r.time} · {r.by}
@@ -501,13 +502,13 @@ export function TransfereesCard({ data, loading, onViewAll }) {
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111f11" }}>{t.name}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111f11" }}>{toText(t.name)}</div>
                     <div style={{ fontSize: 11, color: "#9aaa9a" }}>
                       From: {t.from} · Grade {t.grade}
                     </div>
                   </div>
                   <span className="badge" style={{ color: sColor.color, background: sColor.bg }}>
-                    {t.status}
+                    {toText(t.status)}
                   </span>
                 </div>
               );
@@ -647,7 +648,7 @@ export function CalendarCard({ data, loading }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 12.5, color: "#1a3a1a", fontWeight: 500, lineHeight: 1.3 }}>
-                    {ev.label}
+                    {toText(ev.label)}
                   </div>
                   <div
                     style={{
@@ -658,7 +659,7 @@ export function CalendarCard({ data, loading }) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {ev.type}
+                    {toText(ev.type)}
                   </div>
                 </div>
               </div>

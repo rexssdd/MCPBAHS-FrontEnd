@@ -10,6 +10,7 @@ import {
   SEVERITY_COLOR,
 } from "./adminDashboardTokens.js";
 import { Card, STitle, ProgressRow } from "./AdminDashboardPrimitives.jsx";
+import { toText } from "../../../utils/safeRender.js";
 
 export const BarChart = ({ data }) => (
   <Card style={{ flex: 1 }}>
@@ -337,12 +338,12 @@ export const TeacherCard = ({ data, stats }) => (
     {data.map((t, i) => (
       <div key={i} className="list-row">
         <div>
-          <div className="list-row__name">{t.name}</div>
+          <div className="list-row__name">{toText(t.name)}</div>
           <div className="list-row__meta">
-            {t.subject} · {t.load} sections
+            {toText(t.subject)} · {toText(t.load, 0)} sections
           </div>
         </div>
-        <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{t.status}</span>
+        <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{toText(t.status)}</span>
       </div>
     ))}
   </Card>
@@ -389,11 +390,11 @@ export const RpmsPersonnelReportCard = ({ teacherData = [], stats = {} }) => {
           ) : (
             rows.map((t, i) => (
               <tr key={i}>
-                <td style={{ fontWeight: 600 }}>{t.name}</td>
-                <td>{t.subject}</td>
-                <td className="font-mono">{t.load}</td>
+                <td style={{ fontWeight: 600 }}>{toText(t.name)}</td>
+                <td>{toText(t.subject)}</td>
+                <td className="font-mono">{toText(t.load, 0)}</td>
                 <td>
-                  <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{t.status}</span>
+                  <span className={`badge ${t.status === "Active" ? "badge--green" : "badge--amber"}`}>{toText(t.status)}</span>
                 </td>
               </tr>
             ))

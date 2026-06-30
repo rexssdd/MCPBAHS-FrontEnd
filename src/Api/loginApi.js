@@ -49,6 +49,7 @@ export async function authenticate(username, password) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         username: username.trim(),
         password,

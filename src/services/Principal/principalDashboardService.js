@@ -21,6 +21,64 @@
 import apiClient from "./apiClient";
 
 /* ══════════════════════════════════════════════════════════════
+   HELPERS — defensive shape normalisation for live API data
+   (mirrors src/services/Admin/Dashboard/dashboardService.js)
+══════════════════════════════════════════════════════════════ */
+
+function readLabel(value, fallback = "") {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "string") return value || fallback;
+  if (typeof value === "object") return value.name ?? value.label ?? fallback;
+  return fallback;
+}
+
+/**
+ * Normalises a raw teacher/faculty record into the flat shape the
+ * dashboard's Teacher card expects: { name, subject, load, status }.
+ * Prevents "Minified React error #31" when a relation field (e.g.
+ * department) comes back as { uuid, name } instead of a string.
+ */
+function normaliseTeacherRecord(t) {
+  if (!t || typeof t !== "object") return null;
+
+  const name =
+    readLabel(t.name) ||
+    t.full_name ||
+    [t.first_name, t.middle_name, t.last_name].filter(Boolean).join(" ") ||
+    "Unnamed";
+
+  const subject =
+    readLabel(t.subject) ||
+    readLabel(t.department) ||
+    readLabel(t.position) ||
+    (Array.isArray(t.subjects) ? t.subjects.map((s) => readLabel(s)).filter(Boolean).join(", ") : "") ||
+    "—";
+
+  const sectionList = Array.isArray(t.sections)
+    ? t.sections
+    : Array.isArray(t.assigned_sections)
+      ? t.assigned_sections
+      : null;
+  const load =
+    typeof t.load === "number"
+      ? t.load
+      : typeof t.section_count === "number"
+        ? t.section_count
+        : sectionList
+          ? sectionList.length
+          : 0;
+
+  const status = readLabel(t.status) || readLabel(t.employment_status) || "Active";
+
+  return { name, subject, load, status: /active/i.test(status) ? "Active" : status };
+}
+
+function normaliseTeacherRoster(list) {
+  if (!Array.isArray(list)) return list;
+  return list.map(normaliseTeacherRecord).filter(Boolean);
+}
+
+/* ══════════════════════════════════════════════════════════════
    CORE FETCH HELPER
    Never throws (except AbortError). Always resolves with
    { data, fromApi } so Promise.all never short-circuits.
@@ -238,7 +296,9 @@ export async function fetchPrincipalDashboard(defaults, signal) {
     fetchPrincipalAtRiskStudents  (defaults.atRiskStudents,     signal),
     fetchPrincipalStrands         (defaults.strands,            signal),
     fetchPrincipalTransferees     (defaults.transferees,        signal),
-    fetchPrincipalTeacherData     (defaults.teacherData,        signal),
+    fetchPrincipalTeacherData     (defaults.teacherData,        signal).then((r) =>
+      r.fromApi ? { ...r, data: normaliseTeacherRoster(r.data) } : r
+    ),
     fetchPrincipalFeeData         (defaults.feeData,            signal),
     fetchPrincipalCalendarEvents  (defaults.calendarEvents,     signal),
     fetchPrincipalNotifications   (defaults.notifications,      signal),
