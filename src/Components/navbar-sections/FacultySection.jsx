@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import useInView from "../../hooks/useInView";
 import { fetchFaculty, DEFAULT_FACULTY } from "../../Api/homeApi";
+import { useAuth } from "../../context/useAuth";
 import "../../Css/HomePage/FacultySection.css";
 
 /* Color palette — cycled per card index */
@@ -67,6 +68,11 @@ function SkeletonCard() {
 export default function FacultySection() {
   const [ref, inView] = useInView();
 
+  // Pull the Sanctum token from context so authenticated users get
+  // live data; unauthenticated visitors on the public page get the
+  // graceful fallback without a 401 console error.
+  const { token } = useAuth?.() ?? {};
+
   const [displayList,  setDisplayList]  = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
@@ -75,7 +81,7 @@ export default function FacultySection() {
     let cancelled = false;
 
     (async () => {
-      const { data, isLive } = await fetchFaculty();
+      const { data, isLive } = await fetchFaculty(token ?? null);
 
       if (!cancelled) {
         setDisplayList(data);
@@ -85,7 +91,7 @@ export default function FacultySection() {
     })();
 
     return () => { cancelled = true; };
-  }, []);
+  }, [token]);
 
   return (
     <section id="faculty" className="fac-section">

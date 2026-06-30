@@ -1,6 +1,7 @@
 // src/components/sections/CalendarSection.jsx
 import { useState, useEffect } from "react";
 import useInView from "../../hooks/useInView";
+import { fetchCalendarEvents } from "../../Api/homeApi";
 import "../../Css/HomePage/CalendarSection.css";
 
 /* ── Default / fallback event data ───────────────────────── */
@@ -104,7 +105,11 @@ const SkeletonEventCard = () => (
 );
 
 /* ── API endpoint ─────────────────────────────────────────── */
-const API_URL = "/api/calendar-events"; // ← Change to your endpoint
+/* Fetching is delegated to Api/homeApi.js (fetchCalendarEvents),
+   which resolves the correct backend origin from VITE_BACKEND_URL /
+   VITE_API_BASE_URL — a bare relative path like "/api/calendar-events"
+   doesn't work once the frontend (Vercel) and backend (Railway) are
+   on different domains. */
 
 /* ─────────────────────────────────────────────────────────── */
 export default function CalendarSection() {
@@ -123,16 +128,10 @@ export default function CalendarSection() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchEvents() {
+    async function loadEvents() {
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const json = await res.json();
+        const raw = await fetchCalendarEvents();
         if (cancelled) return;
-
-        // Accept array root or { data: [] } envelope
-        const raw = Array.isArray(json) ? json : json.data ?? [];
 
         if (raw.length > 0) {
           const mapped = raw.map(mapApiEvent);
@@ -151,7 +150,7 @@ export default function CalendarSection() {
       }
     }
 
-    fetchEvents();
+    loadEvents();
     return () => { cancelled = true; };
   }, []);
 

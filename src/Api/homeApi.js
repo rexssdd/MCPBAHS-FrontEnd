@@ -4,10 +4,10 @@
  * All public-facing API calls used by the HomePage sections.
  *
  *   1. School stats          → fetchHomeStats()       GET /api/school/dashboard
- *   2. Announcements (public)→ fetchAnnouncements()   GET /api/v1/public/announcements
- *   3. Faculty (public)      → fetchFaculty()         GET /api/v1/public/faculty
+ *   2. Announcements (public)→ fetchAnnouncements()   GET /api/v1/announcements
+ *   3. Faculty (public)      → fetchFaculty()         GET /api/v1/faculty  (auth:sanctum)
  *
- * All three endpoints are public (no auth token required).
+ * Both endpoints are public (no auth token required).
  *
  * Backend response shapes:
  *
@@ -20,26 +20,33 @@
  *       reports:       { label: string },
  *     }
  *
- *   GET /api/v1/public/announcements  (public, no token needed)
- *     Only announcements with status=posted and target_audience=all —
- *     internal/draft/scheduled announcements are filtered out server-side.
- *     { data: Array<{
- *       id:      string,
- *       title:   string,
- *       text:    string,   ← message body
- *       urgency: string,
- *       date:    string,   ← posted_at, YYYY-MM-DD
- *       tag:     string,
- *     }> }
+ *   GET /api/v1/announcements  (public, no token needed)
+ *     Array<{
+ *       id:          string,
+ *       title:       string,
+ *       text:        string,   ← body/message field
+ *       urgency:     string,
+ *       mode:        string,
+ *       audience:    string,
+ *       date:        string,   ← dissemination_date YYYY-MM-DD
+ *       time:        string,
+ *       status:      string,
+ *       dateCreated: string,
+ *       lastUpdated: string,
+ *     }>
  *
- *   GET /api/v1/public/faculty  (public, no token needed)
- *     Trimmed payload — no email/phone/employment status.
- *     { data: Array<{
- *       id:      string,
- *       name:    string,
- *       subject: string,   ← humanized position
- *       role:    "Teacher" | "Non-Teaching",
- *     }> }
+ *   GET /api/v1/faculty  (requires auth:sanctum token)
+ *     Array<{
+ *       id:         string,
+ *       firstName:  string,
+ *       middleName: string | null,
+ *       lastName:   string,
+ *       role:       "Teacher" | "Non-Teaching",
+ *       department: string,   ← humanized position
+ *       email:      string | null,
+ *       contact:    string | null,
+ *       status:     string,
+ *     }>
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -208,9 +215,7 @@ function mapAnnouncement(item) {
 /**
  * Fetches public announcements for the homepage.
  *
- * GET /api/v1/public/announcements — public, no auth required.
- * Only returns announcements with status=posted and target_audience=all;
- * internal/scheduled/draft announcements are never exposed here.
+ * GET /api/v1/announcements  — public, no auth required
  *
  * Returns the mapped list on success, DEFAULT_ANNOUNCEMENTS on failure.
  *
@@ -261,18 +266,30 @@ function mapFacultyMember(item) {
 /**
  * Fetches faculty/personnel for the homepage FacultySection.
  *
- * GET /api/v1/public/faculty — public, no auth required. Returns a
- * trimmed-down payload (name/subject/role only — no email, phone, or
- * employment status) so it's safe to expose to anonymous visitors.
- * Falls back to DEFAULT_FACULTY on network failure so the public
- * homepage always shows something.
+ * GET /api/v1/faculty — requires auth:sanctum (Sanctum token).
+ * Pass the currently logged-in user's token if available.
+ * Falls back to DEFAULT_FACULTY on auth error or network failure
+ * so the public homepage always shows something.
  *
+ * @param {string|null} [token]  Sanctum bearer token (from AuthContext)
  * @returns {Promise<{ data: Array, isLive: boolean }>}
  */
-export async function fetchFaculty() {
+export async function fetchFaculty(token = null) {
   try {
-    const data = await apiFetch("/api/v1/public/faculty");
-    const raw = Array.isArray(data) ? data : (data?.data ?? []);
+    const headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    };
+
+    const res = await fetch(`${BACKEND_BASE}/api/v1/public/faculty`, {
+      headers,
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const json = await res.json();
+    const raw = Array.isArray(json) ? json : (json?.data ?? []);
 
     if (raw.length === 0) return { data: DEFAULT_FACULTY, isLive: false };
 
@@ -282,5 +299,47 @@ export async function fetchFaculty() {
       console.warn("[homeApi] fetchFaculty failed; using defaults.", err.message);
     }
     return { data: DEFAULT_FACULTY, isLive: false };
+  }
+}
+
+// ─── 4. Calendar events ───────────────────────────────────────────
+
+/**
+ * Fetches the public school calendar for CalendarSection.jsx.
+ *
+ * GET /api/v1/public/calendar-events — public, no auth required.
+ *
+ * @returns {Promise<Array>}
+ */
+export async function fetchCalendarEvents() {
+  try {
+    const data = await apiFetch("/api/v1/public/calendar-events");
+    return Array.isArray(data) ? data : (data?.data ?? []);
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("[homeApi] fetchCalendarEvents failed; using defaults.", err.message);
+    }
+    return [];
+  }
+}
+
+// ─── 5. TVL offers ────────────────────────────────────────────────
+
+/**
+ * Fetches the public TVL track list for TVLSection.jsx.
+ *
+ * GET /api/v1/public/tvl-offers — public, no auth required.
+ *
+ * @returns {Promise<Array>}
+ */
+export async function fetchTvlOffers() {
+  try {
+    const data = await apiFetch("/api/v1/public/tvl-offers");
+    return Array.isArray(data) ? data : (data?.data ?? []);
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("[homeApi] fetchTvlOffers failed; using defaults.", err.message);
+    }
+    return [];
   }
 }

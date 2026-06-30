@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import useInView from "../../hooks/useInView";
 import TVLModal from "../TVLModal";
+import { fetchTvlOffers } from "../../Api/homeApi";
 import "../../Css/HomePage/TVLSection.css";
 
 // ── Default / fallback data ───────────────────────────────
@@ -134,7 +135,10 @@ const TVLSkeletonCard = () => (
 );
 
 // ── API endpoint ──────────────────────────────────────────
-const API_URL = "/api/tvl-offers"; // ← Change to your endpoint
+// Fetching is delegated to Api/homeApi.js (fetchTvlOffers), which
+// resolves the correct backend origin — a bare relative path like
+// "/api/tvl-offers" never resolves once frontend and backend live on
+// different domains (e.g. Vercel + Railway).
 
 // ─────────────────────────────────────────────────────────
 export default function TVLSection() {
@@ -151,16 +155,10 @@ export default function TVLSection() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchOffers() {
+    async function loadOffers() {
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const json = await res.json();
+        const raw = await fetchTvlOffers();
         if (cancelled) return;
-
-        // Accept array root or { data: [] } envelope
-        const raw = Array.isArray(json) ? json : json.data ?? [];
 
         if (raw.length > 0) {
           setOffers(raw.map(mapApiOffer));
@@ -178,7 +176,7 @@ export default function TVLSection() {
       }
     }
 
-    fetchOffers();
+    loadOffers();
     return () => { cancelled = true; };
   }, []);
 
