@@ -103,6 +103,19 @@ function StatusChip({ status }) {
   );
 }
 
+// ── Status → color mapping (shared by modal icon + status chip) ───────────────
+
+function statusColors(status) {
+  const s = (status ?? "").toLowerCase();
+  if (s === "approved") {
+    return { bg: "var(--notif-success-light, #f0fdf4)", border: "#86efac", text: "#166534" };
+  }
+  if (s === "disapproved") {
+    return { bg: "var(--notif-danger-light, #fef2f2)", border: "#fca5a5", text: "#991b1b" };
+  }
+  return { bg: "var(--notif-warning-light, #fffbeb)", border: "#fcd34d", text: "#92400e" };
+}
+
 // ── DetailModal ────────────────────────────────────────────────────────────────
 
 export function DetailModal({ notif, onClose, onGoTo }) {
@@ -110,6 +123,11 @@ export function DetailModal({ notif, onClose, onGoTo }) {
   const d          = notif.detail ?? {};
   const isReport   = notif.type === "report";
   const subLabel   = isReport ? "Review the principal's evaluation below." : "Announcement details below.";
+
+  // The header icon reflects the actual outcome of this notification
+  // (approved = green, disapproved = red, pending/announcement = amber)
+  // instead of always rendering as a hard-coded "danger" red icon.
+  const iconColor = statusColors(d.status);
 
   return (
     <div
@@ -124,11 +142,14 @@ export function DetailModal({ notif, onClose, onGoTo }) {
         {/* Header */}
         <div className="notif-modal-header">
           <div className="notif-modal-header-left">
-            <div className="notif-modal-icon">
+            <div
+              className="notif-modal-icon"
+              style={{ background: iconColor.bg, borderColor: iconColor.border, color: iconColor.text }}
+            >
               {isReport ? <BellIcon /> : <MegaphoneIcon />}
             </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", flexWrap: "wrap" }}>
                 <h2 id="detail-modal-title" className="notif-modal-title" style={{ margin: 0 }}>
                   {d.title ?? (isReport ? "Report Evaluation" : "Announcement")}
                 </h2>
@@ -239,54 +260,47 @@ export function NotifItem({ notif, onView, onMarkRead, onDelete, variant = "full
   const TypeIcon = isReport ? BellIcon : MegaphoneIcon;
 
   if (variant === "simple") {
+    const status = notif.detail?.status;
+    const accent = isReport ? statusColors(status) : { bg: "var(--notif-warning-light, #fffbeb)", border: "#fcd34d", text: "var(--notif-warning, #b45309)" };
+
     return (
       <article
         className={`notif-item notif-item--simple${notif.read ? "" : " notif-item--unread"}`}
         onClick={() => onView(notif)}
         tabIndex={0}
         role="button"
+        aria-label={`Open notification: ${notif.message}`}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onView(notif); }
         }}
       >
-        {/* Type icon strip */}
+        {/* Type icon */}
         <div
-          className="notif-icon-wrap"
-          style={{
-            background: isReport
-              ? "var(--notif-primary-light, #e8f5e8)"
-              : "var(--notif-warning-light, #fffbeb)",
-            color: isReport
-              ? "var(--notif-primary, #1a5c1a)"
-              : "var(--notif-warning, #b45309)",
-            borderRadius: "var(--radius-sm, 6px)",
-            padding: "6px",
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
+          className="notif-icon-wrap notif-icon-wrap--simple"
+          style={{ background: accent.bg, color: accent.text, borderColor: accent.border }}
         >
           <TypeIcon />
         </div>
 
-        <div className="notif-content" style={{ flex: 1, minWidth: 0 }}>
+        <div className="notif-content notif-content--simple">
+          <div className="notif-row-top">
+            <span className="notif-type-label">{isReport ? "Report" : "Announcement"}</span>
+            {!notif.read && <span className="notif-new-pill">New</span>}
+          </div>
           <p className={`notif-message${notif.read ? "" : " notif-message--unread"}`}>
             {notif.message}
           </p>
           <p className="notif-time">{notif.time}</p>
         </div>
 
-        {/* Unread dot */}
-        {!notif.read && (
-          <span className="notif-dot notif-dot--unread" aria-label="Unread" />
-        )}
+        <ArrowIcon className="notif-chevron" />
 
         <button
           className="notif-dismiss-btn"
           onClick={(e) => { e.stopPropagation(); onDelete(notif.id); }}
           aria-label={`Dismiss: ${notif.message}`}
         >
-          <XCircleIcon />
+          <CloseIcon />
         </button>
       </article>
     );
