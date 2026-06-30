@@ -5,8 +5,9 @@ import EnrollmentErrorBoundary from "../../Components/EnrollmentErrorBoundary";
 import {
   Toast, ConfirmModal, Modal, ModalHeader, ModalBody, ModalFooter,
   Breadcrumb, Pagination, SearchInput, DataTable, FormInput, FormSelect,
-  InfoCard, InfoField, Badge,
+  InfoCard, InfoField, Badge, CountryField, SearchableSelect,
 } from "../../Components/ui";
+import { ALL_CITIES } from "../../utils/philippineLocations";
 import { useRegistrarEnrollment } from "../../hooks/Registrar/useRegistrarEnrollment";
 import { isArchived } from "../../utils/archive";
 import { getEnrolleeName, getEnrolleeGrade } from "../../utils/enrollmentValidation";
@@ -53,7 +54,7 @@ const getAvatarBg = name => PALETTE[(name?.charCodeAt(0) ?? 0) % PALETTE.length]
 
 const EMPTY_FORM = {
   firstName:"", middleName:"", lastName:"", email:"", phone:"", dob:"",
-  country:"", city:"", postalCode:"",
+  country:"Philippines", city:"", postalCode:"",
   oldSchoolName:"", oldSchoolType:"", oldSchoolId:"", oldSchoolAddress:"",
 };
 
@@ -426,7 +427,7 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
     email:            initial.email            ?? "",
     phone:            initial.phone            ?? "",
     dob:              initial.dob              ?? "",
-    country:          initial.country          ?? "",
+    country:          initial.country          ?? "Philippines",
     city:             initial.city             ?? "",
     postalCode:       initial.postalCode       ?? "",
     oldSchoolName:    initial.oldSchoolName    ?? "",
@@ -470,9 +471,9 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
         <div>
           <h3 className="form-section-title" style={{ fontSize:13 }}>Address</h3>
           <div className="form-grid-3">
-            <FormInput label="Country"     value={form.country}    onChange={set("country")}    placeholder="Country"/>
-            <FormInput label="City"        value={form.city}       onChange={set("city")}       placeholder="City"/>
-            <FormInput label="Postal Code" value={form.postalCode} onChange={set("postalCode")} placeholder="0000"/>
+            <CountryField value={form.country || "Philippines"} required />
+            <SearchableSelect label="City" value={form.city} onChange={(value) => setForm(f => ({ ...f, city: value }))} options={ALL_CITIES} placeholder="Search city or municipality" required name="registrar-enrollee-city"/>
+            <FormInput label="Postal Code" value={form.postalCode} onChange={set("postalCode")} placeholder="0000" maxLength={4} inputMode="numeric"/>
           </div>
         </div>
 
@@ -504,6 +505,7 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
             <div className="form-grid-3" style={{ marginBottom:16 }}>
               {[
                 ["First Name",    form.firstName],
+                ["Middle Name",   form.middleName],
                 ["Last Name",     form.lastName],
                 ["Date of Birth", form.dob],
                 ["Email",         form.email],
@@ -516,11 +518,24 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
               ))}
             </div>
             <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Address</p>
-            <div className="form-grid-3">
+            <div className="form-grid-3" style={{ marginBottom:16 }}>
               {[
                 ["Country",     form.country],
                 ["City",        form.city],
                 ["Postal Code", form.postalCode],
+              ].map(([l, v]) => (
+                <div key={l}>
+                  <p className="info-field-label">{l}</p>
+                  <div className="form-input" style={{ cursor:"default" }}>{v || "—"}</div>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Old School Information</p>
+            <div className="form-grid-3">
+              {[
+                ["School Name", form.oldSchoolName],
+                ["School Type", form.oldSchoolType],
+                ["School ID",   form.oldSchoolId],
               ].map(([l, v]) => (
                 <div key={l}>
                   <p className="info-field-label">{l}</p>
