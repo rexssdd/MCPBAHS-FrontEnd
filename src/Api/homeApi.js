@@ -4,10 +4,10 @@
  * All public-facing API calls used by the HomePage sections.
  *
  *   1. School stats          → fetchHomeStats()       GET /api/school/dashboard
- *   2. Announcements (public)→ fetchAnnouncements()   GET /api/v1/announcements
- *   3. Faculty (public)      → fetchFaculty()         GET /api/v1/faculty  (auth:sanctum)
+ *   2. Announcements (public)→ fetchAnnouncements()   GET /api/v1/public/announcements
+ *   3. Faculty (public)      → fetchFaculty()         GET /api/v1/public/faculty
  *
- * Both endpoints are public (no auth token required).
+ * All three endpoints are public (no auth token required).
  *
  * Backend response shapes:
  *
@@ -20,33 +20,26 @@
  *       reports:       { label: string },
  *     }
  *
- *   GET /api/v1/announcements  (public, no token needed)
- *     Array<{
- *       id:          string,
- *       title:       string,
- *       text:        string,   ← body/message field
- *       urgency:     string,
- *       mode:        string,
- *       audience:    string,
- *       date:        string,   ← dissemination_date YYYY-MM-DD
- *       time:        string,
- *       status:      string,
- *       dateCreated: string,
- *       lastUpdated: string,
- *     }>
+ *   GET /api/v1/public/announcements  (public, no token needed)
+ *     Only announcements with status=posted and target_audience=all —
+ *     internal/draft/scheduled announcements are filtered out server-side.
+ *     { data: Array<{
+ *       id:      string,
+ *       title:   string,
+ *       text:    string,   ← message body
+ *       urgency: string,
+ *       date:    string,   ← posted_at, YYYY-MM-DD
+ *       tag:     string,
+ *     }> }
  *
- *   GET /api/v1/faculty  (requires auth:sanctum token)
- *     Array<{
- *       id:         string,
- *       firstName:  string,
- *       middleName: string | null,
- *       lastName:   string,
- *       role:       "Teacher" | "Non-Teaching",
- *       department: string,   ← humanized position
- *       email:      string | null,
- *       contact:    string | null,
- *       status:     string,
- *     }>
+ *   GET /api/v1/public/faculty  (public, no token needed)
+ *     Trimmed payload — no email/phone/employment status.
+ *     { data: Array<{
+ *       id:      string,
+ *       name:    string,
+ *       subject: string,   ← humanized position
+ *       role:    "Teacher" | "Non-Teaching",
+ *     }> }
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -215,7 +208,9 @@ function mapAnnouncement(item) {
 /**
  * Fetches public announcements for the homepage.
  *
- * GET /api/v1/announcements  — public, no auth required
+ * GET /api/v1/public/announcements — public, no auth required.
+ * Only returns announcements with status=posted and target_audience=all;
+ * internal/scheduled/draft announcements are never exposed here.
  *
  * Returns the mapped list on success, DEFAULT_ANNOUNCEMENTS on failure.
  *
@@ -223,7 +218,7 @@ function mapAnnouncement(item) {
  */
 export async function fetchAnnouncements() {
   try {
-    const data = await apiFetch("/api/v1/announcements");
+    const data = await apiFetch("/api/v1/public/announcements");
     const raw = Array.isArray(data) ? data : (data?.data ?? []);
 
     if (raw.length === 0) return DEFAULT_ANNOUNCEMENTS;
@@ -266,36 +261,18 @@ function mapFacultyMember(item) {
 /**
  * Fetches faculty/personnel for the homepage FacultySection.
  *
- * GET /api/v1/faculty — requires auth:sanctum (Sanctum token).
- * Pass the currently logged-in user's token if available.
- * Falls back to DEFAULT_FACULTY on auth error or network failure
- * so the public homepage always shows something.
+ * GET /api/v1/public/faculty — public, no auth required. Returns a
+ * trimmed-down payload (name/subject/role only — no email, phone, or
+ * employment status) so it's safe to expose to anonymous visitors.
+ * Falls back to DEFAULT_FACULTY on network failure so the public
+ * homepage always shows something.
  *
- * @param {string|null} [token]  Sanctum bearer token (from AuthContext)
  * @returns {Promise<{ data: Array, isLive: boolean }>}
  */
-export async function fetchFaculty(token = null) {
+export async function fetchFaculty() {
   try {
-    const headers = {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-    };
-
-    const res = await fetch(`${BACKEND_BASE}/api/v1/faculty`, {
-      headers,
-      credentials: "include",
-    });
-
-    // 401 = not authenticated → show fallback silently on public page
-    if (res.status === 401) {
-      return { data: DEFAULT_FACULTY, isLive: false };
-    }
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const json = await res.json();
-    const raw = Array.isArray(json) ? json : (json?.data ?? []);
+    const data = await apiFetch("/api/v1/public/faculty");
+    const raw = Array.isArray(data) ? data : (data?.data ?? []);
 
     if (raw.length === 0) return { data: DEFAULT_FACULTY, isLive: false };
 
