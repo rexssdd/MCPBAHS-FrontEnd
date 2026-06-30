@@ -73,6 +73,18 @@ export default function AnnouncementView({ ann }) {
 
       {/* Body */}
       <div style={{ padding: "28px 32px", flex: 1 }}>
+        {/* Announcement title */}
+        {ann.title && (
+          <h2 style={{
+            fontSize: 17,
+            fontWeight: 700,
+            color: "#111827",
+            margin: "0 0 8px",
+          }}>
+            {ann.title}
+          </h2>
+        )}
+
         {/* Announcement text */}
         <p style={{
           fontSize: 14,

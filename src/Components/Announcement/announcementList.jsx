@@ -177,7 +177,7 @@ export default function AnnouncementList({
         ? a.dissemination_modes.join(" ")
         : (a.dissemination_modes ?? "");
       const q = search.trim().toLowerCase();
-      const matchesSearch = !q || [a.message, modes, a.target_audience, a.status, a.urgency]
+      const matchesSearch = !q || [a.title, a.message, modes, a.target_audience, a.status, a.urgency]
         .some(v => (v || "").toLowerCase().includes(q));
       return (
         matchesSearch &&
@@ -461,7 +461,10 @@ export default function AnnouncementList({
 
                     {/* Content */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="ann-text">{ann.message}</div>
+                      <div className="ann-text">{ann.title || ann.message}</div>
+                      {ann.title && (
+                        <div className="ann-text-preview">{ann.message}</div>
+                      )}
                       <div className="ann-meta">
                         <UrgencyPill urgency={ann.urgency} />
                         <span className="ann-meta-sep" />

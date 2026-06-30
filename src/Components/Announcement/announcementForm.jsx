@@ -221,6 +221,11 @@ function PreviewModal({ form, mode, onConfirm, onCancel }) {
             <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 6 }}>
               {mode === "edit" ? "Edited:" : "New:"}
             </div>
+            {form.title && (
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 6 }}>
+                {form.title}
+              </div>
+            )}
             {preview}
             {(form.message ?? "").length > 220 && (
               <span style={{ color: "#1a5c1a", fontWeight: 600, marginLeft: 4, cursor: "pointer" }}>
