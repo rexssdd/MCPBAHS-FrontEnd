@@ -222,7 +222,18 @@ export function reportToNotification(report) {
 
   const isApproved = status === "Approved";
   const id         = report.uuid ?? report.id ?? `rpt-${Date.now()}-${Math.random()}`;
-  const fileName   = toDisplayValue(report.fileName ?? report.file_name, `SF${toDisplayValue(report.sfNumber, "?")}.pdf`);
+
+  // ReportResource (backend) sends: original_filename, file.original_filename,
+  // and form_type ("sf1".."sf10") — NOT fileName/file_name/sfNumber. Reading
+  // the wrong field names here is what produced the literal "SF?.pdf"
+  // placeholder text.
+  const sfNumber = report.sfNumber ?? (
+    report.form_type ? String(report.form_type).replace(/^sf/i, "") : null
+  );
+  const fileName = toDisplayValue(
+    report.fileName ?? report.file_name ?? report.original_filename ?? report.file?.original_filename,
+    `SF${toDisplayValue(sfNumber, "?")}.pdf`
+  );
   const docId      = toDisplayValue(report.docId ?? report.doc_id, fileName);
 
   // Use evaluatedOn / updated_at / dateSubmitted for grouping

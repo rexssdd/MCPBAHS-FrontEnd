@@ -61,6 +61,13 @@ const FileIcon = memo(() => (
     </svg>
 ));
 
+const MegaphoneIcon = memo(() => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M3 11l18-5v12L3 14v-3z" />
+        <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+    </svg>
+));
+
 const ArrowIcon = memo(() => (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="5" y1="12" x2="19" y2="12" />
@@ -74,13 +81,8 @@ const ArrowIcon = memo(() => (
  * @param {{ notif: import("../../types").Notification, onClose: () => void }} props
  */
 const DetailModal = memo(function DetailModal({ notif, onClose }) {
-    const d = notif.detail;
-
-    const metaFields = [
-        ["File Name", d.fileName],
-        ["Submitted On", d.submittedOn],
-        ["Evaluated On", d.evaluatedOn],
-    ];
+    const d = notif.detail ?? {};
+    const isReport = notif.type === "report";
 
     const statusClass = STATUS_CLASS[d.status] ?? "notif-modal__status--default";
 
@@ -88,46 +90,77 @@ const DetailModal = memo(function DetailModal({ notif, onClose }) {
         <Modal size="md" onClose={onClose}>
             <ModalHeader
                 icon={
-                    <>
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </>
+                    isReport ? (
+                        <>
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </>
+                    ) : (
+                        <>
+                            <path d="M3 11l18-5v12L3 14v-3z" />
+                            <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+                        </>
+                    )
                 }
             >
-                {d.title}
+                {d.title ?? (isReport ? "Report Update" : "Announcement")}
             </ModalHeader>
 
             <ModalBody>
-                <p className="form-section-title" style={{ marginBottom: "12px" }}>Details</p>
-
-                <div className="form-grid-3" style={{ marginBottom: "20px" }}>
-                    {metaFields.map(([label, value]) => (
-                        <div key={label}>
-                            <p className="info-field-label">{label}</p>
-                            <div className="form-input" style={{ cursor: "default" }}>{value ?? "—"}</div>
+                {isReport ? (
+                    <>
+                        <p className="form-section-title" style={{ marginBottom: "12px" }}>Submission Details</p>
+                        <div className="form-grid-3" style={{ marginBottom: "20px" }}>
+                            {[["File Name", d.fileName], ["Submitted On", d.submittedOn], ["Evaluated On", d.evaluatedOn]].map(([label, value]) => (
+                                <div key={label}>
+                                    <p className="info-field-label">{label}</p>
+                                    <div className="form-input" style={{ cursor: "default" }}>{value ?? "—"}</div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                <div className="notif-modal__divider" />
+                        <div className="notif-modal__divider" />
 
-                <p className="form-section-title" style={{ marginBottom: "12px" }}>Feedback</p>
+                        <p className="form-section-title" style={{ marginBottom: "12px" }}>Feedback</p>
 
-                <div style={{ marginBottom: "12px" }}>
-                    <p className="info-field-label">Status</p>
-                    <div className={`form-input ${statusClass}`}>{d.status ?? "—"}</div>
-                </div>
+                        <div style={{ marginBottom: "12px" }}>
+                            <p className="info-field-label">Status</p>
+                            <div className={`form-input ${statusClass}`}>{d.status ?? "—"}</div>
+                        </div>
 
-                <div>
-                    <p className="info-field-label">Comments / Suggestions</p>
-                    <div className={`form-input notif-modal__comments`}>{d.comments ?? "No comments provided."}</div>
-                </div>
+                        <div>
+                            <p className="info-field-label">Comments / Suggestions</p>
+                            <div className="form-input notif-modal__comments">{d.comments ?? "No comments provided."}</div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <p className="form-section-title" style={{ marginBottom: "12px" }}>Announcement Details</p>
+                        <div className="form-grid-3" style={{ marginBottom: "20px" }}>
+                            {[["Urgency", d.urgency], ["Audience", d.audience], ["Scheduled", d.scheduledOn]].map(([label, value]) => (
+                                <div key={label}>
+                                    <p className="info-field-label">{label}</p>
+                                    <div className="form-input" style={{ cursor: "default" }}>{value ?? "—"}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="notif-modal__divider" />
+
+                        <p className="form-section-title" style={{ marginBottom: "12px" }}>Message</p>
+                        <div>
+                            <div className="form-input notif-modal__comments" style={{ minHeight: 60, lineHeight: 1.6 }}>
+                                {d.comments ?? "—"}
+                            </div>
+                        </div>
+                    </>
+                )}
             </ModalBody>
 
             <ModalFooter>
                 <button className="btn btn-primary" onClick={onClose}>
-                    <FileIcon /> Go To Submit <ArrowIcon />
+                    {isReport ? <><FileIcon /> Go To Submit <ArrowIcon /></> : <><MegaphoneIcon /> Close <ArrowIcon /></>}
                 </button>
             </ModalFooter>
         </Modal>

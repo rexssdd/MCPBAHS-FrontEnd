@@ -236,14 +236,14 @@ export default function NotificationPage() {
       <main className="notif-main notif-main--simple">
         <div className="notif-header notif-header--simple">
           <div className="notif-header-left">
-            <h1 className="notif-title">
-              Notifications
+            <div className="notif-title-row">
+              <h1 className="notif-title">Notifications</h1>
               {unreadCount > 0 && (
-                <span className="notif-unread-badge" title={`${unreadCount} unread`}>
+                <span className="notif-badge" title={`${unreadCount} unread`}>
                   {unreadCount}
                 </span>
               )}
-            </h1>
+            </div>
             <p className="notif-subtitle">Announcements and report evaluations from the principal.</p>
           </div>
 
