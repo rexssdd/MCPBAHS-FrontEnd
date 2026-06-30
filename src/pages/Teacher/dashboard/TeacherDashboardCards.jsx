@@ -166,6 +166,8 @@ export const LowPerformersCard = ({ data, onViewAll, loading }) => (
    CLASS SUMMARY CARD
 ══════════════════════════════════════════════════════════ */
 export const ClassSummaryCard = ({ stats, grades, loading }) => {
+  const safeStats = stats ?? {};
+  const totalStudents = safeStats.totalStudents ?? 0;
   const passing = grades.filter(s => s.avg >= 75).length;
   const honors  = grades.filter(s => s.avg >= 90).length;
   const atRisk  = grades.filter(s => s.avg <  75).length;
@@ -176,17 +178,17 @@ export const ClassSummaryCard = ({ stats, grades, loading }) => {
       {loading ? <Skel h={200} r={10}/> : (
         <>
           <div style={{ marginBottom:16 }}>
-            <div style={{ fontSize:32, fontWeight:800, color:"#111f11", lineHeight:1 }}>{stats.totalStudents}</div>
+            <div style={{ fontSize:32, fontWeight:800, color:"#111f11", lineHeight:1 }}>{totalStudents}</div>
             <div style={{ fontSize:11, color:"#6b7c6b", marginTop:2 }}>Total students enrolled</div>
             <div style={{ display:"flex", height:8, borderRadius:6, overflow:"hidden", marginTop:10, gap:2 }}>
-              <div style={{ width:`${(passing/stats.totalStudents)*100}%`, background:"#1a5c1a", borderRadius:3 }}/>
+              <div style={{ width:`${totalStudents > 0 ? (passing/totalStudents)*100 : 0}%`, background:"#1a5c1a", borderRadius:3 }}/>
               <div style={{ flex:1, background:"#ef4444", borderRadius:3 }}/>
             </div>
           </div>
           <Divider />
           {[
-            ["Present Today",   stats.presentToday,   "#15803d"],
-            ["Class Average",   stats.classAverage,   "#1a5c1a"],
+            ["Present Today",   safeStats.presentToday,   "#15803d"],
+            ["Class Average",   safeStats.classAverage,   "#1a5c1a"],
             ["With Honors",     honors,               "#1d4ed8"],
             ["Passed Q3",       passing,              "#15803d"],
             ["At Risk",         atRisk,               "#b91c1c"],
