@@ -9,10 +9,12 @@
  *   loading         — initial fetch in-flight
  *   saving          — save mutation in-flight
  *   apiSource       — "api" | "default" (UI badge hint)
+ *   avatarUploading — profile picture upload in-flight
  *   setDraftField   — update a single draft field
  *   handleEdit      — enter edit mode (snapshot form → draft)
  *   handleCancel    — exit edit mode, discard draft
  *   handleSave      — persist draft changes via API
+ *   handleAvatarUpload — upload + persist a new profile picture
  *   handlePasswordChanged — call after successful password change
  *
  * Fallback behaviour:
@@ -23,6 +25,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import profileService from "../services/Admin/Profile/profileService";
+import { getAuth } from "../utils/authToken";
 
 // ─── Default / fallback profile ───────────────────────────────
 export const DEFAULT_PROFILE = {
@@ -34,6 +37,7 @@ export const DEFAULT_PROFILE = {
   school:             "M.C.P.B.A.H.S",
   department:         "School Administration",
   contactNumber:      "+63 912 345 6789",
+  profileImage:       null,
   lastPasswordChange: null,
 };
 
@@ -45,6 +49,7 @@ export function useProfile() {
   const [loading,   setLoading]   = useState(true);
   const [saving,    setSaving]    = useState(false);
   const [apiSource, setApiSource] = useState("default"); // "api" | "default"
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   // Guard against state updates after unmount (StrictMode safe)
   const mounted = useRef(true);
@@ -128,6 +133,31 @@ export function useProfile() {
     }
   }, [draft, form]);
 
+  // ── Avatar upload (Supabase Storage + DB persist) ─────────
+  /**
+   * Uploads a new profile picture and persists its URL on the user's
+   * row. Independent of the edit/draft flow — applies immediately so
+   * the user gets instant feedback without needing to hit "Save".
+   * Returns { success: boolean, error?: string, url?: string }.
+   */
+  const handleAvatarUpload = useCallback(async (file) => {
+    setAvatarUploading(true);
+    try {
+      const userId = getAuth()?.user?.id ?? getAuth()?.user?.uuid ?? form.employeeId;
+      const { profileImage } = await profileService.uploadProfileImage(file, userId);
+
+      if (mounted.current) {
+        setForm((f) => ({ ...f, profileImage }));
+        setDraft((d) => ({ ...d, profileImage }));
+      }
+      return { success: true, url: profileImage };
+    } catch (err) {
+      return { success: false, error: err.message ?? "Failed to upload profile picture." };
+    } finally {
+      if (mounted.current) setAvatarUploading(false);
+    }
+  }, [form.employeeId]);
+
   // ── Password changed (optimistic timestamp update) ────────
   const handlePasswordChanged = useCallback(() => {
     const now = new Date().toISOString();
@@ -147,11 +177,13 @@ export function useProfile() {
     loading,
     saving,
     apiSource,
+    avatarUploading,
     // Actions
     setDraftField,
     handleEdit,
     handleCancel,
     handleSave,
+    handleAvatarUpload,
     handlePasswordChanged,
   };
 }

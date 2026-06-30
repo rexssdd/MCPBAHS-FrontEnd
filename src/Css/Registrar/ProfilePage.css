@@ -242,6 +242,58 @@ input  { font-family: var(--font-main); }
   line-height: 1;
 }
 
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-file-input {
+  display: none;
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1a5c1a;
+  border: 3px solid var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  transition: background .15s ease, transform .15s ease;
+  z-index: 2;
+}
+
+.avatar-edit-btn:hover:not(:disabled) {
+  background: #246824;
+  transform: scale(1.07);
+}
+
+.avatar-edit-btn:disabled {
+  cursor: default;
+  opacity: .85;
+}
+
+.avatar-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: avatarSpin .7s linear infinite;
+}
+
+@keyframes avatarSpin {
+  to { transform: rotate(360deg); }
+}
+
 .profile-name-row {
   display: flex;
   align-items: flex-end;

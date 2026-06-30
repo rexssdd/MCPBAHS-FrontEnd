@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import Sidebar from "../../Components/Sidebar";
+import AvatarUpload from "../../Components/AvatarUpload";
 import { useProfile } from "../../hooks/useProfile";
 import profileService from "../../services/Admin/Profile/profileService";
 import ProfileErrorBoundary from "../../Components/ProfileErrorBoundary";
@@ -278,10 +279,12 @@ function ProfilePageComponent() {
     loading,
     saving,
     apiSource,
+    avatarUploading,
     setDraftField,
     handleEdit,
     handleCancel,
     handleSave,
+    handleAvatarUpload,
     handlePasswordChanged,
   } = useProfile();
 
@@ -304,6 +307,20 @@ function ProfilePageComponent() {
       showToast(result.error ?? "Failed to update profile.", "error");
     }
   }, [handleSave, showToast]);
+
+  // ── Avatar upload handler — bridges hook result to toast ──
+  const onAvatarUpload = useCallback(async (file, clientError) => {
+    if (clientError) {
+      showToast(clientError, "error");
+      return;
+    }
+    const result = await handleAvatarUpload(file);
+    if (result.success) {
+      showToast("Profile picture updated.");
+    } else {
+      showToast(result.error ?? "Failed to upload profile picture.", "error");
+    }
+  }, [handleAvatarUpload, showToast]);
 
   const initials = getInitials(form.firstName, form.lastName);
 
@@ -358,9 +375,13 @@ function ProfilePageComponent() {
 
           {/* Identity */}
           <div className="profile-identity">
-            <div className="avatar" aria-label={`${form.firstName} ${form.lastName}`}>
-              <span className="avatar-initials">{initials}</span>
-            </div>
+            <AvatarUpload
+              imageUrl={form.profileImage}
+              initials={initials}
+              uploading={avatarUploading}
+              onUpload={onAvatarUpload}
+              name={`${form.firstName} ${form.lastName}`}
+            />
 
             <div className="profile-name-row">
               <div>
