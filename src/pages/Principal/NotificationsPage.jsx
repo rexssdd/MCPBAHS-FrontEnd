@@ -9,6 +9,7 @@ import Sidebar from "../../Components/Sidebar";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../../Components/ui";
 import { fetchAnnouncements } from "../../Api/announcementApi";
 import reportsService from "../../services/Principal/reportService";
+import { toText } from "../../utils/safeRender.js";
 import {
   fetchNotifications,
   markNotificationRead,
@@ -97,20 +98,30 @@ function reportToNotif(r) {
   if (!status || status === "Pending") return null;
   const isApproved = status === "Approved";
   const dateStr  = r.evaluatedOn ?? r.updated_at ?? r.dateSubmitted ?? null;
-  const fileName = r.fileName ?? r.original_filename ?? `SF${r.sfNumber ?? "?"}.pdf`;
+
+  // GET /reports (ReportResource) returns original_filename / file.original_filename
+  // and form_type ("sf1".."sf10") — not fileName/sfNumber.
+  const sfNumber = r.sfNumber ?? (r.form_type ? String(r.form_type).replace(/^sf/i, "") : null);
+  const fileName = r.fileName ?? r.original_filename ?? r.file?.original_filename ?? `SF${sfNumber ?? "?"}.pdf`;
   const docId    = r.docId ?? r.uuid ?? fileName;
+
+  // submitted_by comes back as a relation object { uuid, name }, not a plain
+  // string — toText() pulls the readable name out instead of passing the
+  // raw object through (which crashed the detail modal with React error #31).
+  const submittedByName = toText(r.submittedBy ?? r.submitted_by, "a teacher");
+
   return {
     id: `rpt-${r.uuid ?? r.id}`,
     type: "report", read: false,
     message: isApproved
-      ? `Report ${docId} submitted by ${r.submittedBy ?? "a teacher"} has been approved`
-      : `Report ${docId} submitted by ${r.submittedBy ?? "a teacher"} has been disapproved`,
+      ? `Report ${docId} submitted by ${submittedByName} has been approved`
+      : `Report ${docId} submitted by ${submittedByName} has been disapproved`,
     time: formatTime(dateStr), group: getGroup(dateStr), _sortDate: dateStr,
     detail: {
       type: "report",
       title: isApproved ? "Report Approved" : "Report Disapproved",
       fileName,
-      submittedBy: r.submittedBy ?? r.submitted_by ?? "—",
+      submittedBy: submittedByName,
       submittedOn: r.submittedOn ?? r.dateSubmitted ?? "—",
       evaluatedOn: dateStr ? new Date(dateStr).toLocaleDateString() : "—",
       gradeLevel:  r.gradeLevel ?? "—",
@@ -221,7 +232,7 @@ function DetailModal({ notif, onClose }) {
           <line x1="12" y1="8" x2="12" y2="12"/>
           <line x1="12" y1="16" x2="12.01" y2="16"/></>
       }>
-        {d.title ?? (isReport ? "Report Update" : "Announcement")}
+        {toText(d.title, isReport ? "Report Update" : "Announcement")}
       </ModalHeader>
 
       <ModalBody>
@@ -234,7 +245,7 @@ function DetailModal({ notif, onClose }) {
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="info-field-label">{label}</p>
-                  <div className="form-input" style={{ cursor: "default" }}>{value ?? "—"}</div>
+                  <div className="form-input" style={{ cursor: "default" }}>{toText(value)}</div>
                 </div>
               ))}
             </div>
@@ -246,12 +257,12 @@ function DetailModal({ notif, onClose }) {
                 cursor: "default",
                 color: d.status === "Disapproved" ? "var(--red-700)" : "#15803d",
                 fontWeight: 600,
-              }}>{d.status ?? "—"}</div>
+              }}>{toText(d.status)}</div>
             </div>
             <div>
               <p className="info-field-label">Comments / Remarks</p>
               <div className="form-input" style={{ cursor: "default", minHeight: "60px", lineHeight: 1.6 }}>
-                {d.comments ?? "No comments provided."}
+                {toText(d.comments, "No comments provided.")}
               </div>
             </div>
           </>
@@ -262,7 +273,7 @@ function DetailModal({ notif, onClose }) {
               {[["Urgency", d.urgency], ["Audience", d.audience], ["Scheduled", d.scheduledOn]].map(([label, value]) => (
                 <div key={label}>
                   <p className="info-field-label">{label}</p>
-                  <div className="form-input" style={{ cursor: "default" }}>{value ?? "—"}</div>
+                  <div className="form-input" style={{ cursor: "default" }}>{toText(value)}</div>
                 </div>
               ))}
             </div>
@@ -270,7 +281,7 @@ function DetailModal({ notif, onClose }) {
             <p className="form-section-title" style={{ marginBottom: "12px" }}>Message</p>
             <div>
               <div className="form-input" style={{ cursor: "default", minHeight: 60, lineHeight: 1.6 }}>
-                {d.comments ?? "—"}
+                {toText(d.comments)}
               </div>
             </div>
           </>

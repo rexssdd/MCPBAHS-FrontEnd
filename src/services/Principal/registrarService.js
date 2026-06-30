@@ -12,9 +12,18 @@
 
 import { authHeaders } from "../../utils/authToken";
 
-export const BASE_URL =
-  (typeof window !== "undefined" && import.meta?.env?.VITE_API_BASE_URL) ||
-  "http://localhost:8000/api/v1";
+// BASE_URL — must match the convention used by every other service in this
+// codebase (apiClient.js files, reportService.js, announcementApi.js):
+// VITE_API_BASE_URL is documented to end in "/api" (NOT "/api/v1") — services
+// append "/v1" themselves. This file previously used the raw env var as-is,
+// so every request here resolved to ".../api/registrar/..." instead of
+// ".../api/v1/registrar/...", 404'd against the backend's v1-prefixed routes,
+// and silently fell back to mock data on every single dashboard load.
+export const BASE_URL = (() => {
+  const base = (typeof window !== "undefined" && import.meta?.env?.VITE_API_BASE_URL) || "http://localhost:8000/api";
+  if (base.endsWith("/v1") || base.endsWith("/v1/")) return base.replace(/\/$/, "");
+  return `${base.replace(/\/$/, "")}/v1`;
+})();
 
 // ─── Auth helpers ─────────────────────────────────────────────────
 
