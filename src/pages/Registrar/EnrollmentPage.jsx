@@ -7,18 +7,18 @@ import {
   Breadcrumb, Pagination, SearchInput, DataTable, FormInput, FormSelect,
   InfoCard, InfoField, Badge, CountryField, SearchableSelect,
 } from "../../Components/ui";
-import { ALL_CITIES } from "../../utils/philippineLocations";
+import { ALL_CITIES, ALL_PROVINCES, getCityOptions } from "../../utils/philippineLocations";
 import { useRegistrarEnrollment } from "../../hooks/Registrar/useRegistrarEnrollment";
 import { isArchived } from "../../utils/archive";
 import { getEnrolleeName, getEnrolleeGrade } from "../../utils/enrollmentValidation";
 import "../../Css/Registrar/EnrollmentPage.css";
+import "../../Css/EnrollmentForm/G7Form.css";
 
 /* ══════════════════════════════════════════════════════════════
    CONSTANTS
    ══════════════════════════════════════════════════════════════ */
 const SCHOOL_TYPES  = ["Public", "Private", "Special Science School", "Integrated School"];
 const GRADE_LEVELS  = ["Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"];
-const CITIES        = ["Davao City","Tagum City","Digos City","Panabo City","General Santos City","Other"];
 const PAGE_SIZE     = 8;
 const PALETTE       = ["#1a5c1a","#2a7a2a","#c4920a","#1d4ed8","#7c3aed","#dc2626","#0891b2","#db2777"];
 
@@ -49,11 +49,29 @@ const getInitials = name =>
 
 const getAvatarBg = name => PALETTE[(name?.charCodeAt(0) ?? 0) % PALETTE.length];
 
+/* ── Form data model — mirrors the public Grade 7 Enrollment Form ── */
 const EMPTY_FORM = {
-  firstName:"", middleName:"", lastName:"", email:"", phone:"", dob:"",
-  country:"Philippines", city:"", postalCode:"",
-  oldSchoolName:"", oldSchoolType:"", oldSchoolId:"", oldSchoolAddress:"",
-  attachment:null, attachmentName:"",
+  // Learner Information
+  lrn:"", firstName:"", middleName:"", lastName:"", nameExt:"",
+  dob:"", sex:"", age:"", motherTongue:"", religion:"", placeOfBirth:"",
+  // Learner Background
+  isIP:"No", ipSpecify:"", is4Ps:"No", householdId:"", isPWD:"No",
+  // Address
+  houseNo:"", streetName:"", barangay:"", city:"", province:"",
+  country:"Philippines", postalCode:"",
+  // Contact
+  email:"", phone:"",
+  // Parents
+  fatherLast:"", fatherFirst:"", fatherMiddle:"", fatherExt:"",
+  motherLast:"", motherFirst:"", motherMiddle:"", motherExt:"",
+  // Enrollment
+  gradeLevel:"",
+  // Attachments
+  idPic:null, idPicName:"",
+  signature:null, signatureName:"",
+  birthCert:null, birthCertName:"",
+  reportCard:null, reportCardName:"",
+  consentImages:false, consentData:false,
 };
 
 const EMPTY_FILTERS = {
@@ -209,10 +227,73 @@ function RejectModal({ enrollee, onConfirm, onCancel }) {
   );
 }
 
+/* ── shared bits for the G7-style layout ── */
+function SectionHeading({ children }) {
+  return <div className="section-heading">{children}</div>;
+}
+
+function YesNoStatic({ value }) {
+  return (
+    <div className="yesno-pill">
+      {["Yes","No"].map(opt=>(
+        <span key={opt} className={`yesno-pill-option${value===opt?" active":""}`}>{opt}</span>
+      ))}
+    </div>
+  );
+}
+
+function YesNo({ value, onChange }) {
+  return (
+    <div className="yesno-pill">
+      {["Yes", "No"].map(opt => (
+        <button
+          key={opt}
+          type="button"
+          className={`yesno-pill-option${value === opt ? " active" : ""}`}
+          onClick={() => onChange(opt)}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function UploadBox({ label, file, fileName, onFile }) {
+  const displayName = file?.name || fileName || "";
+  return (
+    <div className={`upload-box${displayName ? " has-file" : ""}`}>
+      <input type="file" onChange={e => onFile(e.target.files?.[0] || null)} />
+      <span className="upload-icon">{displayName ? "📄" : "📎"}</span>
+      <span className="upload-label">{label}</span>
+      {displayName
+        ? <span className="upload-filename">{displayName}</span>
+        : <span className="upload-hint">Click to upload</span>}
+    </div>
+  );
+}
+
+function ConsentBox({ checked, onToggle, children }) {
+  return (
+    <div className={`consent-box${checked ? " checked" : ""}`} onClick={onToggle}>
+      <div className={`consent-checkbox${checked ? " checked" : ""}`}>
+        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+          <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+      <span className="consent-text">{children}</span>
+    </div>
+  );
+}
+
+const parentName = (last, first, middle, ext) =>
+  [first, middle, last, ext].filter(Boolean).join(" ") || "—";
+
 /* ══════════════════════════════════════════════════════════════
    ENROLLEE VIEW
-   Section order mirrors the form exactly:
-   Personal Info → Address → Old School Info → Attachments
+   Section order mirrors the public Grade 7 enrollment form exactly:
+   Learner Info → Learner Background → Address → Contact →
+   Parents → Attachments
    ══════════════════════════════════════════════════════════════ */
 function EnrolleeView({ enrollee, onBack, onEdit, onApprove, onReject }) {
   const [showReject, setShowReject] = useState(false);
@@ -265,65 +346,102 @@ function EnrolleeView({ enrollee, onBack, onEdit, onApprove, onReject }) {
         </div>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+      {/* 1. Learner Information */}
+      <InfoCard title="Learner Information">
+        <div className="form-grid-3" style={{ marginBottom:16 }}>
+          <InfoField label="LRN"          value={enrollee.lrn        || "—"}/>
+          <InfoField label="First Name"   value={enrollee.firstName  || "—"}/>
+          <InfoField label="Middle Name"  value={enrollee.middleName || "—"}/>
+        </div>
+        <div className="form-grid-3" style={{ marginBottom:16 }}>
+          <InfoField label="Last Name"        value={enrollee.lastName || "—"}/>
+          <InfoField label="Name Extension"   value={enrollee.nameExt  || "—"}/>
+          <InfoField label="Sex"              value={enrollee.sex      || "—"}/>
+        </div>
+        <div className="form-grid-3" style={{ marginBottom:16 }}>
+          <InfoField label="Date of Birth"  value={enrollee.dob   || "—"}/>
+          <InfoField label="Age"            value={enrollee.age   || "—"}/>
+          <InfoField label="Mother Tongue"  value={enrollee.motherTongue || "—"}/>
+        </div>
+        <div className="form-grid-3">
+          <InfoField label="Religion"       value={enrollee.religion     || "—"}/>
+          <InfoField label="Place of Birth" value={enrollee.placeOfBirth || "—"}/>
+          <InfoField label="Grade Level"    value={gradeLevel}/>
+        </div>
+      </InfoCard>
 
-        {/* 1. Personal Information — row of 3 + row of 3 */}
-        <InfoCard title="Personal Information">
+      {/* 2. Learner Background */}
+      <InfoCard title="Learner Background" style={{ marginTop:16 }}>
+        <div className="form-grid-3">
+          <div>
+            <p className="info-field-label">Indigenous People (IP)</p>
+            <YesNoStatic value={enrollee.isIP || "No"}/>
+            {enrollee.isIP === "Yes" && <InfoField label="Community" value={enrollee.ipSpecify || "—"}/>}
+          </div>
+          <div>
+            <p className="info-field-label">4Ps Beneficiary</p>
+            <YesNoStatic value={enrollee.is4Ps || "No"}/>
+            {enrollee.is4Ps === "Yes" && <InfoField label="Household ID" value={enrollee.householdId || "—"}/>}
+          </div>
+          <div>
+            <p className="info-field-label">Person with Disability (PWD)</p>
+            <YesNoStatic value={enrollee.isPWD || "No"}/>
+          </div>
+        </div>
+      </InfoCard>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginTop:16 }}>
+
+        {/* 3. Address */}
+        <InfoCard title="Address">
           <div className="form-grid-3" style={{ marginBottom:16 }}>
-            <InfoField label="First Name"  value={enrollee.firstName  || "—"}/>
-            <InfoField label="Middle Name" value={enrollee.middleName || "—"}/>
-            <InfoField label="Last Name"   value={enrollee.lastName   || "—"}/>
+            <InfoField label="House No."  value={enrollee.houseNo    || "—"}/>
+            <InfoField label="Street"     value={enrollee.streetName || "—"}/>
+            <InfoField label="Barangay"   value={enrollee.barangay   || "—"}/>
           </div>
           <div className="form-grid-3">
-            <InfoField label="Email"         value={enrollee.email || "—"}/>
-            <InfoField label="Phone"         value={enrollee.phone || "—"}/>
-            <InfoField label="Date of Birth" value={enrollee.dob   || "—"}/>
+            <InfoField label="City / Municipality" value={enrollee.city    || "—"}/>
+            <InfoField label="Province"            value={enrollee.province|| "—"}/>
+            <InfoField label="Country"             value={enrollee.country || "—"}/>
           </div>
         </InfoCard>
 
-        {/* 2. Address — row of 3 */}
-        <InfoCard title="Address">
+        {/* 4. Contact */}
+        <InfoCard title="Contact Information">
           <div className="form-grid-3">
-            <InfoField label="Country"     value={enrollee.country    || "—"}/>
-            <InfoField label="City"        value={enrollee.city       || "—"}/>
+            <InfoField label="Email"       value={enrollee.email      || "—"}/>
+            <InfoField label="Phone"       value={enrollee.phone      || "—"}/>
             <InfoField label="Postal Code" value={enrollee.postalCode || "—"}/>
           </div>
         </InfoCard>
 
-        {/* 3. Old School Information — row of 3 + full-width address */}
-        <InfoCard title="Old School Information">
-          <div className="form-grid-3" style={{ marginBottom:16 }}>
-            <InfoField label="School Name" value={enrollee.oldSchoolName    || "—"}/>
-            <InfoField label="School Type" value={enrollee.oldSchoolType    || "—"}/>
-            <InfoField label="School ID"   value={enrollee.oldSchoolId      || "—"}/>
-          </div>
-          <InfoField label="School Address" value={enrollee.oldSchoolAddress || "—"}/>
+        {/* 5. Parents */}
+        <InfoCard title="Parents">
+          <p className="info-field-label" style={{ marginBottom:6 }}>Father's Name</p>
+          <InfoField label="" value={parentName(enrollee.fatherLast, enrollee.fatherFirst, enrollee.fatherMiddle, enrollee.fatherExt)}/>
+          <p className="info-field-label" style={{ margin:"12px 0 6px" }}>Mother's Maiden Name</p>
+          <InfoField label="" value={parentName(enrollee.motherLast, enrollee.motherFirst, enrollee.motherMiddle, enrollee.motherExt)}/>
         </InfoCard>
 
-        {/* 4. Attachments — real data, no mock */}
+        {/* 6. Attachments */}
         <InfoCard title="Attachments">
-          {enrollee.attachmentName ? (
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <div>
-                <p style={{ fontSize:13, fontWeight:700, color:"var(--gray-900)", margin:"0 0 2px" }}>
-                  {enrollee.attachmentName}
-                </p>
-                {enrollee.attachmentSize && (
-                  <p style={{ fontSize:12, color:"var(--green-800)", margin:0 }}>{enrollee.attachmentSize}</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {[
+              ["2×2 ID Picture",     enrollee.idPicName],
+              ["E-Signature",        enrollee.signatureName],
+              ["Birth Certificate",  enrollee.birthCertName],
+              ["Report Card / F138", enrollee.reportCardName],
+            ].map(([label, name]) => (
+              <div key={label} style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <span style={{ fontSize:13, color:"var(--gray-700)" }}>{label}</span>
+                {name ? (
+                  <span style={{ fontSize:12, fontWeight:700, color:"var(--green-800)" }}>{name}</span>
+                ) : (
+                  <span style={{ fontSize:12, color:"var(--gray-400)" }}>Not attached</span>
                 )}
               </div>
-              <div style={{
-                width:28, height:28, borderRadius:"50%", background:"var(--green-800)",
-                display:"flex", alignItems:"center", justifyContent:"center",
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </div>
-            </div>
-          ) : (
-            <p style={{ fontSize:13, color:"var(--gray-500)", margin:0 }}>No file attached.</p>
-          )}
+            ))}
+          </div>
         </InfoCard>
       </div>
 
@@ -340,33 +458,19 @@ function EnrolleeView({ enrollee, onBack, onEdit, onApprove, onReject }) {
 
 /* ══════════════════════════════════════════════════════════════
    ENROLLEE FORM  (Add / Edit)
-   Section order: Personal Info → Address → Old School Info → Attachments
-   Mirrors EnrolleeView exactly for muscle-memory uniformity.
+   Section order + fields mirror the public Grade 7 enrollment form
+   exactly: Learner Info → Learner Background → Address → Contact →
+   Parents → Attachments. Preview mirrors the same order.
    ══════════════════════════════════════════════════════════════ */
 function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
   const isEdit = mode === "edit";
-  const [form, setForm] = useState(initial ? {
-    firstName:        initial.firstName        ?? "",
-    middleName:       initial.middleName       ?? "",
-    lastName:         initial.lastName         ?? "",
-    email:            initial.email            ?? "",
-    phone:            initial.phone            ?? "",
-    dob:              initial.dob              ?? "",
-    country:          initial.country          ?? "Philippines",
-    city:             initial.city             ?? "",
-    postalCode:       initial.postalCode       ?? "",
-    oldSchoolName:    initial.oldSchoolName    ?? "",
-    oldSchoolType:    initial.oldSchoolType    ?? "",
-    oldSchoolId:      initial.oldSchoolId      ?? "",
-    oldSchoolAddress: initial.oldSchoolAddress ?? "",
-    attachment:       null,
-    attachmentName:   initial.attachmentName   ?? "",
-  } : { ...EMPTY_FORM });
-
-  const [preview,         setPreview]         = useState(false);
-  const [attachmentError, setAttachmentError] = useState("");
+  const [form, setForm] = useState(initial ? { ...EMPTY_FORM, ...initial, idPic:null, signature:null, birthCert:null, reportCard:null } : { ...EMPTY_FORM });
+  const [preview, setPreview] = useState(false);
 
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+  const toggle = k => () => setForm(f => ({ ...f, [k]: !f[k] }));
+  const setFile = (fileKey, nameKey) => file =>
+    setForm(f => ({ ...f, [fileKey]: file, [nameKey]: file ? file.name : "" }));
 
   const breadParts = isEdit
     ? [{ label:"Enrollment", onClick:onCancel }, { label: initial?.learnerId ?? "" }, { label:"Edit" }]
@@ -382,93 +486,177 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
           <div className="form-divider"/>
         </div>
 
-        {/* 1. Personal Information */}
+        {/* 1. Learner Information */}
         <div>
-          <h3 className="form-section-title" style={{ fontSize:13 }}>Personal Information</h3>
-          <div className="form-grid-3" style={{ marginBottom:16 }}>
-            <FormInput label="First Name"  value={form.firstName}  onChange={set("firstName")}  placeholder="First Name"/>
-            <FormInput label="Middle Name" value={form.middleName} onChange={set("middleName")} placeholder="Middle Name"/>
-            <FormInput label="Last Name"   value={form.lastName}   onChange={set("lastName")}   placeholder="Last Name"/>
+          <SectionHeading>Learner Information</SectionHeading>
+          <div className="form-grid" style={{ marginBottom:16 }}>
+            <div className="form-field">
+              <label className="form-label">LRN</label>
+              <input className="form-input" value={form.lrn} onChange={set("lrn")} placeholder="12-digit LRN (if available)"/>
+            </div>
+            <div className="form-field">
+              <label className="form-label">Grade Level to Enroll</label>
+              <FormSelect value={form.gradeLevel} onChange={set("gradeLevel")} options={GRADE_LEVELS}/>
+            </div>
           </div>
-          <div className="form-grid-3">
-            <FormInput label="Email"         value={form.email} onChange={set("email")} placeholder="Email Address" type="email"/>
-            <FormInput label="Phone number"  value={form.phone} onChange={set("phone")} placeholder="09XX XXX XXXX" type="tel"/>
-            <FormInput label="Date of Birth" value={form.dob}   onChange={set("dob")}   type="date"/>
-          </div>
-        </div>
-
-        <div className="form-divider"/>
-
-        {/* 2. Address */}
-        <div>
-          <h3 className="form-section-title" style={{ fontSize:13 }}>Address</h3>
-          <div className="form-grid-3">
-            <CountryField value={form.country || "Philippines"} required/>
+          <div className="form-grid">
+            <div className="form-field"><label className="form-label">Last Name</label>
+              <input className="form-input" value={form.lastName} onChange={set("lastName")}/></div>
+            <div className="form-field"><label className="form-label">First Name</label>
+              <input className="form-input" value={form.firstName} onChange={set("firstName")}/></div>
+            <div className="form-field"><label className="form-label">Middle Name</label>
+              <input className="form-input" value={form.middleName} onChange={set("middleName")}/></div>
+            <div className="form-field"><label className="form-label">Name Extension</label>
+              <input className="form-input" value={form.nameExt} onChange={set("nameExt")} placeholder="Jr., Sr., III"/></div>
+            <div className="form-field"><label className="form-label">Birth Date</label>
+              <input type="date" className="form-input" value={form.dob} onChange={set("dob")}/></div>
+            <div className="form-field"><label className="form-label">Sex</label>
+              <FormSelect value={form.sex} onChange={set("sex")} options={["Male","Female"]}/></div>
+            <div className="form-field"><label className="form-label">Age</label>
+              <input type="number" className="form-input" value={form.age} onChange={set("age")} placeholder="e.g. 12"/></div>
+            <div className="form-field"><label className="form-label">Mother Tongue</label>
+              <input className="form-input" value={form.motherTongue} onChange={set("motherTongue")} placeholder="e.g. Filipino"/></div>
+            <div className="form-field"><label className="form-label">Religion</label>
+              <input className="form-input" value={form.religion} onChange={set("religion")} placeholder="e.g. Roman Catholic"/></div>
             <SearchableSelect
-              label="City"
-              value={form.city}
-              onChange={value => setForm(f => ({ ...f, city: value }))}
+              label="Place of Birth"
+              value={form.placeOfBirth}
+              onChange={value => setForm(f => ({ ...f, placeOfBirth: value }))}
               options={ALL_CITIES}
               placeholder="Search city or municipality"
-              required
-              name="registrar-enrollee-city"
+              name="registrar-birthplace"
             />
-            <FormInput label="Postal Code" value={form.postalCode} onChange={set("postalCode")} placeholder="0000" maxLength={4} inputMode="numeric"/>
           </div>
         </div>
 
         <div className="form-divider"/>
 
-        {/* 3. Old School Information */}
+        {/* 2. Learner Background */}
         <div>
-          <h3 className="form-section-title" style={{ fontSize:13 }}>Old School Information</h3>
-          <div className="form-grid-3" style={{ marginBottom:16 }}>
-            <FormInput  label="School Name" value={form.oldSchoolName} onChange={set("oldSchoolName")} placeholder="School Name"/>
-            <FormSelect label="School Type" value={form.oldSchoolType} onChange={set("oldSchoolType")} options={SCHOOL_TYPES}/>
-            <FormInput  label="School ID"   value={form.oldSchoolId}   onChange={set("oldSchoolId")}   placeholder="School ID"/>
+          <SectionHeading>Learner Background</SectionHeading>
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            {[
+              { q:"Is the learner part of an Indigenous People (IP) / Indigenous Cultural Community?", key:"isIP",  specKey:"ipSpecify",  specLabel:"Please specify community" },
+              { q:"Is the family a beneficiary of the 4Ps program?",                                   key:"is4Ps", specKey:"householdId", specLabel:"4Ps Household ID Number" },
+              { q:"Is the learner a Person with Disability (PWD)?",                                    key:"isPWD" },
+            ].map(({ q, key, specKey, specLabel }) => (
+              <div key={key} className="condition-row">
+                <span className="condition-label">{q}</span>
+                <div className="condition-input-wrap">
+                  <YesNo value={form[key]} onChange={set(key)}/>
+                </div>
+                {specKey && form[key] === "Yes" && (
+                  <div className="condition-extra">
+                    <input className="form-input" value={form[specKey]} onChange={set(specKey)} placeholder={specLabel}/>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <FormInput label="School Address" value={form.oldSchoolAddress} onChange={set("oldSchoolAddress")} placeholder="School Address"/>
         </div>
 
         <div className="form-divider"/>
 
-        {/* 4. Attachments */}
+        {/* 3. Address */}
         <div>
-          <h3 className="form-section-title" style={{ fontSize:13 }}>Attachments</h3>
-          <label
-            className="form-input"
-            style={{
-              cursor:"pointer", display:"flex", alignItems:"center",
-              justifyContent:"space-between",
-              color: form.attachmentName ? "var(--gray-900)" : "var(--gray-400)",
-            }}
-          >
-            <span style={{ flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-              {form.attachmentName || "Birth Certificate (PDF, JPG, PNG — max 10 MB)"}
-            </span>
-            <span style={{ fontSize:12, fontWeight:700, color:"var(--green-800)", marginLeft:12, flexShrink:0 }}>
-              {form.attachmentName ? "Replace" : "Upload"}
-            </span>
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              style={{ display:"none" }}
-              onChange={e => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (!file) return;
-                if (file.size > 10 * 1024 * 1024) {
-                  setAttachmentError("File must be 10 MB or smaller.");
-                  return;
-                }
-                setAttachmentError("");
-                setForm(f => ({ ...f, attachment:file, attachmentName:file.name }));
-              }}
+          <SectionHeading>Address</SectionHeading>
+          <div className="form-grid">
+            <div className="form-field"><label className="form-label">House No.</label>
+              <input className="form-input" value={form.houseNo} onChange={set("houseNo")} placeholder="e.g. 123"/></div>
+            <div className="form-field"><label className="form-label">Street Name</label>
+              <input className="form-input" value={form.streetName} onChange={set("streetName")}/></div>
+            <div className="form-field"><label className="form-label">Barangay</label>
+              <input className="form-input" value={form.barangay} onChange={set("barangay")}/></div>
+            <SearchableSelect
+              label="Province"
+              value={form.province}
+              onChange={value => setForm(f => ({ ...f, province: value, city: "" }))}
+              options={ALL_PROVINCES}
+              placeholder="Search province"
+              name="registrar-province"
             />
-          </label>
-          {attachmentError && (
-            <p style={{ fontSize:12, color:"#dc2626", marginTop:6 }}>{attachmentError}</p>
-          )}
+            <SearchableSelect
+              label="City / Municipality"
+              value={form.city}
+              onChange={value => setForm(f => ({ ...f, city: value }))}
+              options={getCityOptions(form.province) ?? ALL_CITIES}
+              placeholder="Search city or municipality"
+              name="registrar-city"
+            />
+            <CountryField value={form.country || "Philippines"} required/>
+            <div className="form-field"><label className="form-label">Postal Code</label>
+              <input className="form-input" value={form.postalCode} onChange={set("postalCode")} placeholder="0000" maxLength={4} inputMode="numeric"/></div>
+          </div>
+        </div>
+
+        <div className="form-divider"/>
+
+        {/* 4. Contact */}
+        <div>
+          <SectionHeading>Contact Information</SectionHeading>
+          <div className="form-grid">
+            <div className="form-field"><label className="form-label">Email Address</label>
+              <input type="email" className="form-input" value={form.email} onChange={set("email")} placeholder="Email Address"/></div>
+            <div className="form-field"><label className="form-label">Phone Number</label>
+              <input type="tel" className="form-input" value={form.phone} onChange={set("phone")} placeholder="09XX XXX XXXX"/></div>
+          </div>
+        </div>
+
+        <div className="form-divider"/>
+
+        {/* 5. Parents */}
+        <div>
+          {[
+            { title:"Father's Name",         keys:["fatherLast","fatherFirst","fatherMiddle","fatherExt"] },
+            { title:"Mother's Maiden Name",  keys:["motherLast","motherFirst","motherMiddle","motherExt"] },
+          ].map(({ title, keys }, gi) => (
+            <div key={title}>
+              {gi > 0 && <div className="gap-md"/>}
+              <SectionHeading>{title}</SectionHeading>
+              <div className="form-grid">
+                {["Last Name","First Name","Middle Name","Name Extension"].map((lbl, i) => (
+                  <div className="form-field" key={lbl}>
+                    <label className="form-label">{lbl}</label>
+                    <input
+                      className="form-input"
+                      value={form[keys[i]]}
+                      onChange={set(keys[i])}
+                      placeholder={lbl === "Name Extension" ? "Jr., Sr." : ""}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="form-divider"/>
+
+        {/* 6. Attachments */}
+        <div>
+          <SectionHeading>Required Documents</SectionHeading>
+          <div className="upload-grid">
+            <UploadBox label="(2×2) ID Picture"           file={form.idPic}      fileName={form.idPicName}      onFile={setFile("idPic","idPicName")}/>
+            <UploadBox label="E-Signature"                 file={form.signature}  fileName={form.signatureName}  onFile={setFile("signature","signatureName")}/>
+            <UploadBox label="Birth Certificate (PSA/NSO)" file={form.birthCert}  fileName={form.birthCertName}  onFile={setFile("birthCert","birthCertName")}/>
+            <UploadBox label="Form 137 or Report Card"     file={form.reportCard} fileName={form.reportCardName} onFile={setFile("reportCard","reportCardName")}/>
+          </div>
+
+          <div className="gap-md"/>
+          <SectionHeading>Consent &amp; Certification</SectionHeading>
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <ConsentBox checked={form.consentImages} onToggle={toggle("consentImages")}>
+              I hereby allow the use of my images and signature for educational purposes only.
+              These materials will be used solely for academic documentation, presentations, or
+              reports, and will not be distributed, sold, or used for any commercial or
+              unauthorized purposes.
+            </ConsentBox>
+            <ConsentBox checked={form.consentData} onToggle={toggle("consentData")}>
+              I hereby certify that the above information given are true and correct to the best
+              of my knowledge and I allow the Department of Education to use these details for
+              enrollment data collection, treated as confidential per the Data Privacy Act of 2012.
+            </ConsentBox>
+          </div>
         </div>
 
         <div className="form-divider"/>
@@ -487,15 +675,21 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
           <ModalHeader>Preview</ModalHeader>
           <ModalBody>
 
-            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Personal Information</p>
+            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Learner Information</p>
             <div className="form-grid-3" style={{ marginBottom:16 }}>
               {[
-                ["First Name",    form.firstName],
-                ["Middle Name",   form.middleName],
-                ["Last Name",     form.lastName],
-                ["Email",         form.email],
-                ["Phone",         form.phone],
-                ["Date of Birth", form.dob],
+                ["LRN",            form.lrn],
+                ["Last Name",      form.lastName],
+                ["First Name",     form.firstName],
+                ["Middle Name",    form.middleName],
+                ["Name Extension", form.nameExt],
+                ["Sex",            form.sex],
+                ["Date of Birth",  form.dob],
+                ["Age",            form.age],
+                ["Mother Tongue",  form.motherTongue],
+                ["Religion",       form.religion],
+                ["Place of Birth", form.placeOfBirth],
+                ["Grade Level",    form.gradeLevel],
               ].map(([l, v]) => (
                 <div key={l}>
                   <p className="info-field-label">{l}</p>
@@ -504,11 +698,22 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
               ))}
             </div>
 
+            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Learner Background</p>
+            <div className="form-grid-3" style={{ marginBottom:16 }}>
+              <div><p className="info-field-label">Indigenous People</p><YesNoStatic value={form.isIP}/></div>
+              <div><p className="info-field-label">4Ps Beneficiary</p><YesNoStatic value={form.is4Ps}/></div>
+              <div><p className="info-field-label">Person with Disability</p><YesNoStatic value={form.isPWD}/></div>
+            </div>
+
             <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Address</p>
             <div className="form-grid-3" style={{ marginBottom:16 }}>
               {[
-                ["Country",     form.country],
-                ["City",        form.city],
+                ["House No.",  form.houseNo],
+                ["Street",     form.streetName],
+                ["Barangay",   form.barangay],
+                ["City / Municipality", form.city],
+                ["Province",   form.province],
+                ["Country",    form.country],
                 ["Postal Code", form.postalCode],
               ].map(([l, v]) => (
                 <div key={l}>
@@ -518,13 +723,11 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
               ))}
             </div>
 
-            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Old School Information</p>
+            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Contact Information</p>
             <div className="form-grid-3" style={{ marginBottom:16 }}>
               {[
-                ["School Name",    form.oldSchoolName],
-                ["School Type",    form.oldSchoolType],
-                ["School ID",      form.oldSchoolId],
-                ["School Address", form.oldSchoolAddress],
+                ["Email", form.email],
+                ["Phone", form.phone],
               ].map(([l, v]) => (
                 <div key={l}>
                   <p className="info-field-label">{l}</p>
@@ -533,9 +736,27 @@ function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
               ))}
             </div>
 
+            <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Parents</p>
+            <div className="form-grid-3" style={{ marginBottom:16 }}>
+              <div><p className="info-field-label">Father's Name</p>
+                <div className="form-input" style={{ cursor:"default" }}>{parentName(form.fatherLast, form.fatherFirst, form.fatherMiddle, form.fatherExt)}</div></div>
+              <div><p className="info-field-label">Mother's Maiden Name</p>
+                <div className="form-input" style={{ cursor:"default" }}>{parentName(form.motherLast, form.motherFirst, form.motherMiddle, form.motherExt)}</div></div>
+            </div>
+
             <p style={{ fontWeight:600, marginBottom:12, fontSize:13, color:"var(--gray-700)" }}>Attachments</p>
-            <div className="form-input" style={{ cursor:"default", color: form.attachmentName ? "var(--gray-900)" : "var(--gray-400)" }}>
-              {form.attachmentName || "No file attached"}
+            <div className="form-grid-3">
+              {[
+                ["2×2 ID Picture", form.idPicName],
+                ["E-Signature", form.signatureName],
+                ["Birth Certificate", form.birthCertName],
+                ["Report Card / Form 137", form.reportCardName],
+              ].map(([l, v]) => (
+                <div key={l}>
+                  <p className="info-field-label">{l}</p>
+                  <div className="form-input" style={{ cursor:"default", color: v ? "var(--gray-900)" : "var(--gray-400)" }}>{v || "No file attached"}</div>
+                </div>
+              ))}
             </div>
 
           </ModalBody>
