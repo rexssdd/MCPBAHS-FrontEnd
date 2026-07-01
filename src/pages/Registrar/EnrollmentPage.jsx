@@ -331,7 +331,7 @@ function EnrolleeView({ enrollee, onBack, onEdit, onApprove, onReject }) {
         <div>
           <h2 style={{ fontSize:20, fontWeight:800, color:"var(--green-800)", margin:"0 0 4px" }}>{fullName}</h2>
           <p style={{ fontSize:13, color:"var(--gray-500)", margin:"0 0 4px" }}>
-            {gradeLevel} · {enrollee.sectionId || "—"}
+            {gradeLevel} · {enrollee.sectionName || enrollee.sectionId || "Not yet assigned"}
           </p>
           <StatusPill status={enrollee.status}/>
         </div>
