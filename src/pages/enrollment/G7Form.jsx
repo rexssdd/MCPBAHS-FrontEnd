@@ -162,11 +162,9 @@ function G7FormComponent() {
   const [files, setFiles] = useState(EMPTY_FILES);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Note: submit/submitting/error/succeeded/reset are declared further down,
-  // right after finalizeSubmit — the final-submit function needs to know
-  // recordExists (whether an in-progress draft already exists), so the hook
-  // call moved below where that state is defined.
-
+  // All async/API state is owned by the hook.
+  const { submit, submitting, error, succeeded, reset } = useFormSubmit(submitEnrollment);
+  
   // ── Field helpers ──────────────────────────────────────────────
 
   // Generic updater for string/select/YesNo fields.
@@ -217,11 +215,6 @@ function G7FormComponent() {
 
   const [fetching,   setFetching]   = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  // Tracks whether a learner row already exists for the current LRN (found
-  // via handleLrnLookup, e.g. resuming a previously-submitted application).
-  // Used only to decide whether the FINAL submit should POST (create) or
-  // PUT (update) — nothing is written to the database before that.
-  const [recordExists, setRecordExists] = useState(false);
 
   const handleLrnLookup = useCallback(async (lrn) => {
     if (!lrn || lrn.length < 12) return;
@@ -235,13 +228,8 @@ function G7FormComponent() {
       setFetchError(result.error);
       return;
     }
-    if (!result.data) {
-      // 404 → first-time enrollee, nothing to prefill, nothing exists yet.
-      setRecordExists(false);
-      return;
-    }
+    if (!result.data) return; // 404 → first-time enrollee, nothing to prefill
 
-    setRecordExists(true); // existing enrollee found — final submit must PUT, not POST
     setF(prev => {
       const next = { ...prev };
       Object.entries(result.data).forEach(([k, v]) => {
@@ -250,6 +238,12 @@ function G7FormComponent() {
       return next;
     });
   }, []);
+
+  const saveDraft = useCallback(async () => {
+    if (!f.lrn) return;
+    const result = await updateEnrollment(f.lrn, f, files);
+    if (!result.ok) setFetchError(result.error);
+  }, [f, files]);
 
   // ─────────────────────────────────────────────────────────────
 
@@ -261,30 +255,11 @@ function G7FormComponent() {
     return !hasValidationErrors(errors);
   }, [f, files, step]);
 
-  // FIX: previously called saveDraft() here, which wrote a row to the
-  // database on the very first "Next →" click (before the applicant had
-  // even finished the form), then again on every step after. Repeated test
-  // runs / abandoned wizards kept colliding on the LRN unique constraint.
-  // Next now only validates the current step and advances locally — no
-  // network call, nothing touches the database until the final Submit.
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (!validateCurrentStep()) return;
+    await saveDraft();
     setStep(s => s + 1);
-  }, [validateCurrentStep]);
-
-  // The ONLY place this form writes to the database. Creates a new learner
-  // (POST) unless handleLrnLookup already found an existing record for this
-  // LRN, in which case it updates that record (PUT) instead of colliding
-  // with the unique constraint.
-  const finalizeSubmit = useCallback(
-    (formData, filesArg) =>
-      recordExists && formData.lrn
-        ? updateEnrollment(formData.lrn, formData, filesArg)
-        : submitEnrollment(formData, filesArg),
-    [recordExists]
-  );
-
-  const { submit, submitting, error, succeeded, reset } = useFormSubmit(finalizeSubmit);
+  }, [saveDraft, validateCurrentStep]);
 
   const handleSubmit = useCallback(() => {
     if (!validateCurrentStep()) return;
@@ -301,7 +276,6 @@ function G7FormComponent() {
     setFiles(EMPTY_FILES);
     setValidationErrors({});
     setFetchError(null); // ✅ ADDED
-    setRecordExists(false); // FIX: otherwise a second application incorrectly PUTs against the previous applicant's record
   }, [reset]);
 
   // ─── Step renderers ────────────────────────────────────────────
@@ -566,7 +540,7 @@ function G7FormComponent() {
             <span className="form-step-counter">Step {step + 1} / {STEPS.length}</span>
 
               {step < STEPS.length - 1 ? (
-              // Next only validates and advances locally — no DB write until final Submit
+              // 🔁 MODIFIED — saves draft before advancing
               <Btn onClick={handleNext}>Next →</Btn>
             ) : (
               <Btn onClick={handleSubmit} disabled={submitting}>
