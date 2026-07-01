@@ -32,11 +32,16 @@ function buildTvlFormData(data, { isUpdate = false } = {}) {
   formData.append("title", data.title ?? "");
   formData.append("description", data.description ?? "");
   formData.append("icon", data.icon ?? "");
+  formData.append("duration", data.duration ?? "");
   formData.append("display_order", String(data.display_order ?? 0));
   formData.append("is_active", data.is_active ? "1" : "0");
 
   (data.certifications ?? []).forEach((cert, i) => {
     formData.append(`certifications[${i}]`, cert);
+  });
+
+  (data.details ?? []).forEach((detail, i) => {
+    formData.append(`details[${i}]`, detail);
   });
 
   if (data.image instanceof File) {

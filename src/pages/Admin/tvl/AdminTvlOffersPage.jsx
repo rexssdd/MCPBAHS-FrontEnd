@@ -24,9 +24,11 @@ const EMPTY_FORM = {
   title: "",
   description: "",
   icon: "",
+  duration: "",
   display_order: 0,
   is_active: true,
   certifications: [],
+  details: [],
   image: null,
 };
 
@@ -36,10 +38,12 @@ function normalizeOffer(offer) {
     title: offer.title ?? "",
     description: offer.description ?? "",
     icon: offer.icon ?? "",
+    duration: offer.duration ?? "",
     image_url: offer.image_url ?? null,
     display_order: offer.display_order ?? 0,
     is_active: Boolean(offer.is_active),
     certifications: Array.isArray(offer.certifications) ? offer.certifications : [],
+    details: Array.isArray(offer.details) ? offer.details : [],
     image: null,
   };
 }
@@ -89,9 +93,11 @@ export default function AdminTvlOffersPage() {
       title: offer.title,
       description: offer.description,
       icon: offer.icon,
+      duration: offer.duration,
       display_order: offer.display_order,
       is_active: offer.is_active,
       certifications: offer.certifications,
+      details: offer.details,
       image: null,
     });
     setImagePreview(offer.image_url);
@@ -115,6 +121,14 @@ export default function AdminTvlOffersPage() {
       .map((s) => s.trim())
       .filter(Boolean);
     setForm((f) => ({ ...f, certifications: list }));
+  };
+
+  const handleDetailsChange = (e) => {
+    const list = e.target.value
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    setForm((f) => ({ ...f, details: list }));
   };
 
   const handleSubmit = async () => {
@@ -274,6 +288,30 @@ export default function AdminTvlOffersPage() {
                 onChange={handleCertificationsChange}
                 placeholder="NC II, NC III"
               />
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <FormInput
+                label="Duration"
+                value={form.duration}
+                onChange={(e) => setForm((f) => ({ ...f, duration: e.target.value }))}
+                placeholder="2 Semesters"
+                maxLength={100}
+              />
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <label className="form-label">What You'll Learn (one item per line)</label>
+              <textarea
+                className="form-input"
+                rows={4}
+                value={form.details.join("\n")}
+                onChange={handleDetailsChange}
+                placeholder={"Crop production & soil management\nLivestock & poultry raising\nBasic aquaculture techniques"}
+              />
+              <p style={{ fontSize: 12, color: "#7a8a7c", marginTop: 4 }}>
+                Shown as the checklist in the public "What You'll Learn" popup.
+              </p>
             </div>
 
             <div style={{ marginTop: 12 }}>
