@@ -316,7 +316,7 @@ export function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
           <ModalBody>
             <p style={{fontWeight:600,marginBottom:12,fontSize:13,color:"var(--gray-700)"}}>Personal Information</p>
             <div className="form-grid-3" style={{marginBottom:16}}>
-              {[["First Name",form.firstName],["Middle Name",form.middleName],["Last Name",form.lastName],["Date of Birth",form.dob],["Email",form.email],["Phone",form.phone]]
+              {[["First Name",form.firstName],["Last Name",form.lastName],["Date of Birth",form.dob],["Email",form.email],["Phone",form.phone]]
                 .map(([l,v])=>(
                   <div key={l}>
                     <p className="info-field-label">{l}</p>
@@ -325,18 +325,8 @@ export function EnrolleeForm({ initial, mode, onSave, onCancel, isSaving }) {
                 ))}
             </div>
             <p style={{fontWeight:600,marginBottom:12,fontSize:13,color:"var(--gray-700)"}}>Address</p>
-            <div className="form-grid-3" style={{marginBottom:16}}>
-              {[["Country",form.country],["City",form.city],["Postal Code",form.postalCode]]
-                .map(([l,v])=>(
-                  <div key={l}>
-                    <p className="info-field-label">{l}</p>
-                    <div className="form-input" style={{cursor:"default"}}>{v||"—"}</div>
-                  </div>
-                ))}
-            </div>
-            <p style={{fontWeight:600,marginBottom:12,fontSize:13,color:"var(--gray-700)"}}>Old School Information</p>
             <div className="form-grid-3">
-              {[["School Name",form.oldSchoolName],["School Type",form.oldSchoolType],["School ID",form.oldSchoolId]]
+              {[["Country",form.country],["City",form.city],["Postal Code",form.postalCode]]
                 .map(([l,v])=>(
                   <div key={l}>
                     <p className="info-field-label">{l}</p>
