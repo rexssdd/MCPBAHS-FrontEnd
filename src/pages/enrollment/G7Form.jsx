@@ -162,9 +162,11 @@ function G7FormComponent() {
   const [files, setFiles] = useState(EMPTY_FILES);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // All async/API state is owned by the hook.
-  const { submit, submitting, error, succeeded, reset } = useFormSubmit(submitEnrollment);
-  
+  // Note: submit/submitting/error/succeeded/reset are declared further down,
+  // right after finalizeSubmit — the final-submit function needs to know
+  // recordExists (whether an in-progress draft already exists), so the hook
+  // call moved below where that state is defined.
+
   // ── Field helpers ──────────────────────────────────────────────
 
   // Generic updater for string/select/YesNo fields.
@@ -215,6 +217,11 @@ function G7FormComponent() {
 
   const [fetching,   setFetching]   = useState(false);
   const [fetchError, setFetchError] = useState(null);
+  // Tracks whether a learner row already exists for the current LRN — either
+  // because handleLrnLookup() found one, or because saveDraft() already
+  // created one earlier in the wizard. Used to decide whether the next save
+  // should POST (create) or PUT (update).
+  const [recordExists, setRecordExists] = useState(false);
 
   const handleLrnLookup = useCallback(async (lrn) => {
     if (!lrn || lrn.length < 12) return;
@@ -228,8 +235,13 @@ function G7FormComponent() {
       setFetchError(result.error);
       return;
     }
-    if (!result.data) return; // 404 → first-time enrollee, nothing to prefill
+    if (!result.data) {
+      // 404 → first-time enrollee, nothing to prefill, nothing exists yet.
+      setRecordExists(false);
+      return;
+    }
 
+    setRecordExists(true); // existing enrollee found — future saves must PUT, not POST
     setF(prev => {
       const next = { ...prev };
       Object.entries(result.data).forEach(([k, v]) => {
@@ -240,10 +252,26 @@ function G7FormComponent() {
   }, []);
 
   const saveDraft = useCallback(async () => {
-    if (!f.lrn) return;
-    const result = await updateEnrollment(f.lrn, f, files);
-    if (!result.ok) setFetchError(result.error);
-  }, [f, files]);
+    if (!f.lrn) return; // No LRN entered yet — nothing to key a draft on.
+
+    // FIX: this used to always call updateEnrollment (PUT). For a brand-new
+    // applicant that record doesn't exist yet, so the very first "Next →"
+    // click hit PUT /enrollment/grade7/{lrn} on a nonexistent learner and
+    // the backend correctly 404'd ("No enrollee found for that LRN or ID."),
+    // surfacing as an error banner before the user even reached Submit.
+    // Create the record on the first draft save, then switch to update for
+    // every save after that once we know it exists.
+    const result = recordExists
+      ? await updateEnrollment(f.lrn, f, files)
+      : await submitEnrollment(f, files);
+
+    if (!result.ok) {
+      setFetchError(result.error);
+      return;
+    }
+
+    setRecordExists(true);
+  }, [f, files, recordExists]);
 
   // ─────────────────────────────────────────────────────────────
 
@@ -261,6 +289,21 @@ function G7FormComponent() {
     setStep(s => s + 1);
   }, [saveDraft, validateCurrentStep]);
 
+  // FIX: the final submit must also respect recordExists — if a draft was
+  // already created earlier in the wizard (LRN entered, then "Next" clicked
+  // at least once), re-POSTing the same LRN here would collide with the
+  // unique constraint and fail as "lrn has already been taken." Update the
+  // existing draft to finalize it instead of creating a duplicate.
+  const finalizeSubmit = useCallback(
+    (formData, filesArg) =>
+      recordExists && formData.lrn
+        ? updateEnrollment(formData.lrn, formData, filesArg)
+        : submitEnrollment(formData, filesArg),
+    [recordExists]
+  );
+
+  const { submit, submitting, error, succeeded, reset } = useFormSubmit(finalizeSubmit);
+
   const handleSubmit = useCallback(() => {
     if (!validateCurrentStep()) return;
     submit(f, files);
@@ -276,6 +319,7 @@ function G7FormComponent() {
     setFiles(EMPTY_FILES);
     setValidationErrors({});
     setFetchError(null); // ✅ ADDED
+    setRecordExists(false); // FIX: otherwise a second application incorrectly PUTs against the previous applicant's record
   }, [reset]);
 
   // ─── Step renderers ────────────────────────────────────────────
