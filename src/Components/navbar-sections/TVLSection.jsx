@@ -77,6 +77,12 @@ const DEFAULT_TVL_OFFERS = [
 
 // ── Normalize API item to internal shape ──────────────────
 // Adjust field names to match your actual API response.
+//
+// IMPORTANT: image intentionally does NOT fall back to a
+// DEFAULT_TVL_OFFERS stock photo anymore. Once the API returns real
+// offers, nothing about them should be mixed with mock data — an
+// offer the admin hasn't uploaded a photo for should show its icon
+// placeholder, not an unrelated stock image borrowed from the mock set.
 function mapApiOffer(item, index = 0) {
   return {
     id:          item.id,
@@ -88,8 +94,8 @@ function mapApiOffer(item, index = 0) {
                    : item.competencies ?? item.skills ?? [],
     duration:    item.duration    ?? "2 Semesters",
     tesda:       item.tesda       ?? item.ncLevel ?? "NC II Eligible",
-    image:       item.image_url   ?? item.image ?? item.imageUrl ?? item.photo
-                   ?? DEFAULT_TVL_OFFERS[index % DEFAULT_TVL_OFFERS.length].image,
+    image:       item.image_url   ?? item.image ?? item.imageUrl ?? item.photo ?? null,
+    icon:        item.icon        ?? "🎓",
     accent:      item.accent      ?? item.color ?? "#1a4f7a",
   };
 }
@@ -264,12 +270,28 @@ export default function TVLSection() {
                       }}
                     >
                       <figure className="tvl-card__figure">
-                        <img
-                          src={offer.image}
-                          alt={offer.title}
-                          className="tvl-card__image"
-                          loading="lazy"
-                        />
+                        {offer.image ? (
+                          <img
+                            src={offer.image}
+                            alt={offer.title}
+                            className="tvl-card__image"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className="tvl-card__image"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 48,
+                              background: `linear-gradient(135deg, ${offer.accent}22, ${offer.accent}11)`,
+                            }}
+                            aria-hidden="true"
+                          >
+                            {offer.icon}
+                          </div>
+                        )}
                         <div className="tvl-card__scrim" aria-hidden="true" />
                         <span className="tvl-card__tag" style={{ background: offer.accent }}>
                           {offer.tag}

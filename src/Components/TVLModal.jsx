@@ -41,11 +41,27 @@ export default function TVLModal({ offer, onClose }) {
 
         {/* ── Hero image ── */}
         <figure className="tvm-figure">
-          <img
-            src={offer.image}
-            alt={offer.title}
-            className="tvm-figure__img"
-          />
+          {offer.image ? (
+            <img
+              src={offer.image}
+              alt={offer.title}
+              className="tvm-figure__img"
+            />
+          ) : (
+            <div
+              className="tvm-figure__img"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 72,
+                background: `linear-gradient(135deg, ${offer.accent}22, ${offer.accent}11)`,
+              }}
+              aria-hidden="true"
+            >
+              {offer.icon || "🎓"}
+            </div>
+          )}
           <div className="tvm-figure__scrim" aria-hidden="true" />
           <span
             className="tvm-tag"
