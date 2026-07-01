@@ -217,10 +217,10 @@ function G7FormComponent() {
 
   const [fetching,   setFetching]   = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  // Tracks whether a learner row already exists for the current LRN — either
-  // because handleLrnLookup() found one, or because saveDraft() already
-  // created one earlier in the wizard. Used to decide whether the next save
-  // should POST (create) or PUT (update).
+  // Tracks whether a learner row already exists for the current LRN (found
+  // via handleLrnLookup, e.g. resuming a previously-submitted application).
+  // Used only to decide whether the FINAL submit should POST (create) or
+  // PUT (update) — nothing is written to the database before that.
   const [recordExists, setRecordExists] = useState(false);
 
   const handleLrnLookup = useCallback(async (lrn) => {
@@ -241,7 +241,7 @@ function G7FormComponent() {
       return;
     }
 
-    setRecordExists(true); // existing enrollee found — future saves must PUT, not POST
+    setRecordExists(true); // existing enrollee found — final submit must PUT, not POST
     setF(prev => {
       const next = { ...prev };
       Object.entries(result.data).forEach(([k, v]) => {
@@ -250,28 +250,6 @@ function G7FormComponent() {
       return next;
     });
   }, []);
-
-  const saveDraft = useCallback(async () => {
-    if (!f.lrn) return; // No LRN entered yet — nothing to key a draft on.
-
-    // FIX: this used to always call updateEnrollment (PUT). For a brand-new
-    // applicant that record doesn't exist yet, so the very first "Next →"
-    // click hit PUT /enrollment/grade7/{lrn} on a nonexistent learner and
-    // the backend correctly 404'd ("No enrollee found for that LRN or ID."),
-    // surfacing as an error banner before the user even reached Submit.
-    // Create the record on the first draft save, then switch to update for
-    // every save after that once we know it exists.
-    const result = recordExists
-      ? await updateEnrollment(f.lrn, f, files)
-      : await submitEnrollment(f, files);
-
-    if (!result.ok) {
-      setFetchError(result.error);
-      return;
-    }
-
-    setRecordExists(true);
-  }, [f, files, recordExists]);
 
   // ─────────────────────────────────────────────────────────────
 
@@ -283,17 +261,21 @@ function G7FormComponent() {
     return !hasValidationErrors(errors);
   }, [f, files, step]);
 
-  const handleNext = useCallback(async () => {
+  // FIX: previously called saveDraft() here, which wrote a row to the
+  // database on the very first "Next →" click (before the applicant had
+  // even finished the form), then again on every step after. Repeated test
+  // runs / abandoned wizards kept colliding on the LRN unique constraint.
+  // Next now only validates the current step and advances locally — no
+  // network call, nothing touches the database until the final Submit.
+  const handleNext = useCallback(() => {
     if (!validateCurrentStep()) return;
-    await saveDraft();
     setStep(s => s + 1);
-  }, [saveDraft, validateCurrentStep]);
+  }, [validateCurrentStep]);
 
-  // FIX: the final submit must also respect recordExists — if a draft was
-  // already created earlier in the wizard (LRN entered, then "Next" clicked
-  // at least once), re-POSTing the same LRN here would collide with the
-  // unique constraint and fail as "lrn has already been taken." Update the
-  // existing draft to finalize it instead of creating a duplicate.
+  // The ONLY place this form writes to the database. Creates a new learner
+  // (POST) unless handleLrnLookup already found an existing record for this
+  // LRN, in which case it updates that record (PUT) instead of colliding
+  // with the unique constraint.
   const finalizeSubmit = useCallback(
     (formData, filesArg) =>
       recordExists && formData.lrn
@@ -584,7 +566,7 @@ function G7FormComponent() {
             <span className="form-step-counter">Step {step + 1} / {STEPS.length}</span>
 
               {step < STEPS.length - 1 ? (
-              // 🔁 MODIFIED — saves draft before advancing
+              // Next only validates and advances locally — no DB write until final Submit
               <Btn onClick={handleNext}>Next →</Btn>
             ) : (
               <Btn onClick={handleSubmit} disabled={submitting}>
